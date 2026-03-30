@@ -47,24 +47,18 @@ generate_html :: proc(
 	style_content: string
 	if embed {
 		style_bytes, _ := os.read_entire_file(config.paths.style_css, context.allocator)
-		style_content = strings.concatenate(
-			{"<style>", string(style_bytes), "</style>"},
-			context.temp_allocator,
-		)
+		style_content = strings.concatenate({"<style>", string(style_bytes), "</style>"}, context.temp_allocator)
 	} else {
-		style_content = config.paths.style_css
+		style_content = strings.concatenate({`<link rel="stylesheet" href="`, config.paths.style_css, `">`}, context.temp_allocator)
 	}
 	replacements["{{style_css}}"] = style_content
 
 	theme_content: string
 	if embed {
 		theme_bytes, _ := os.read_entire_file(config.paths.theme_css, context.allocator)
-		theme_content = strings.concatenate(
-			{"<style>", string(theme_bytes), "</style>"},
-			context.temp_allocator,
-		)
+		theme_content = strings.concatenate({"<style>", string(theme_bytes), "</style>"}, context.temp_allocator)
 	} else {
-		theme_content = config.paths.theme_css
+		theme_content = strings.concatenate({`<link rel="stylesheet" href="`, config.paths.theme_css, `">`}, context.temp_allocator)
 	}
 	replacements["{{theme_css}}"] = theme_content
 
