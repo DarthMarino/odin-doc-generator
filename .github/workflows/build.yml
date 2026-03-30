@@ -1,0 +1,33 @@
+name: Build Docs
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Odin
+        run: |
+          wget https://github.com/odin-lang/Odin/releases/download/dev-2026-03/odin-linux-amd64-dev-2026-03.tar.gz
+          tar -xzf odin-linux-amd64-dev-2026-03.tar.gz
+          sudo mv odin /opt/odin
+          export PATH="/opt/odin:$PATH"
+
+      - name: Build doc generator
+        run: |
+          export PATH="/opt/odin:$PATH"
+          /opt/odin/odin build .
+
+      - name: Generate docs
+        run: ./odin-doc-generator --embed
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          include_files: index.html
