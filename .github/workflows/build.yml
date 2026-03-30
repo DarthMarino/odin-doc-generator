@@ -14,7 +14,8 @@ jobs:
         run: |
           wget https://github.com/odin-lang/Odin/releases/download/dev-2026-03/odin-linux-amd64-dev-2026-03.tar.gz
           tar -xzf odin-linux-amd64-dev-2026-03.tar.gz
-          sudo mv odin /opt/odin
+          ODIN_DIR=$(ls -d odin* 2>/dev/null | head -1)
+          sudo mv "$ODIN_DIR" /opt/odin
           export PATH="/opt/odin:$PATH"
 
       - name: Build doc generator
