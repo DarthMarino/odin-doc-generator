@@ -12,8 +12,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y wget tar clang
+          sudo apt-get update
+          sudo apt-get install -y wget tar clang
 
       - name: Download and install Odin
         run: |
@@ -28,9 +28,7 @@ jobs:
           PATH: /opt/odin:$PATH
         run: |
           odin build .
-          mkdir -p docs
           ./odin-doc-generator --embed
-          mv index.html docs/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
