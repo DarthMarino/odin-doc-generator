@@ -22,10 +22,9 @@ jobs:
           tar -xzf odin-linux-amd64-dev-2026-03.tar.gz -C /opt/odin --strip-components=1
           chmod +x /opt/odin/odin
           rm odin-linux-amd64-dev-2026-03.tar.gz
+          echo "/opt/odin" >> $GITHUB_PATH
 
       - name: Build docs
-        env:
-          PATH: /opt/odin:$PATH
         run: |
           odin build .
           ./odin-doc-generator --embed
