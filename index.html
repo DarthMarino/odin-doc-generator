@@ -1,0 +1,4032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odin Doc Generator</title>
+    <link rel="stylesheet" href="<style>/* ============================================================================
+   Odin Obsidian — Style System
+
+   A refined design system for API documentation.
+   Built on tonal layering, subtle blur effects, and generous spacing.
+   ============================================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+/* Design tokens — the foundation of the visual language */
+:root {
+  /* Color palette — carefully balanced for dark mode */
+  --bg: #131313;
+  --surface: #131313;
+  --surface-low: #1c1b1b;
+  --surface-lowest: #0e0e0e;
+  --surface-high: #2a2a2a;
+  --surface-highest: #333333;
+
+  /* Text hierarchy — from primary to hint */
+  --text: #e5e2e1;
+  --text-dim: #8e8c8b;
+  --text-faint: #6c6c6c;
+  --text-inverse: #131313;
+
+  /* Accent colors for interactive elements */
+  --accent: #9dcaff;
+  --accent-dim: rgba(157, 202, 255, 0.15);
+  --accent-glow: rgba(157, 202, 255, 0.08);
+
+  /* Secondary brand color */
+  --secondary: #ffb2bd;
+  --secondary-container: #ca0350;
+
+  /* Subtle separators — no hard borders */
+  --ghost: rgba(255, 255, 255, 0.06);
+  --ghost-strong: rgba(255, 255, 255, 0.1);
+
+  /* Sidebar-specific colors */
+  --sb-bg: #1c1b1b;
+  --sb-text: #8e8c8b;
+  --sb-hover: #252424;
+  --sb-active-bar: var(--accent);
+
+  /* Depth and shadows */
+  --shadow-ambient: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  /* Border radius scale */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+  --r-xl: 12px;
+
+  /* Spacing scale — consistent throughout */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.65rem;
+  --sp-4: 0.9rem;
+  --sp-5: 1.1rem;
+  --sp-6: 1.4rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+
+  /* Font families */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
+
+  /* Type badge backgrounds and text colors */
+  --badge-struct: rgba(157, 202, 255, 0.12);
+  --badge-struct-fg: #9dcaff;
+  --badge-enum: rgba(168, 213, 162, 0.12);
+  --badge-enum-fg: #a8d5a2;
+  --badge-proc: rgba(255, 178, 189, 0.12);
+  --badge-proc-fg: #ffb2bd;
+  --badge-union: rgba(196, 165, 240, 0.12);
+  --badge-union-fg: #c4a5f0;
+}
+
+/* Reset all elements to a consistent baseline */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sidebar — left navigation panel */
+#sidebar {
+  width: 260px;
+  min-width: 220px;
+  background: var(--sb-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    width 0.25s ease,
+    min-width 0.25s ease,
+    opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+#sidebar.hidden {
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Resize handle between sidebar and main content */
+#sidebar-resize {
+  width: 3px;
+  cursor: col-resize;
+  background: transparent;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+#sidebar-resize:hover,
+#sidebar-resize.dragging {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-dim);
+}
+
+/* Sidebar header with project name and controls */
+#sidebar-header {
+  padding: var(--sp-5) var(--sp-4) var(--sp-4) var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-shrink: 0;
+  background: var(--sb-bg);
+}
+
+#sidebar-header-btns {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+#sidebar-header-btns button {
+  font-size: 0.75rem;
+  padding: 3px 6px;
+  border: none;
+  background: none;
+  color: var(--text-faint);
+  border-radius: var(--r-sm);
+}
+
+#sidebar-header-btns button:hover {
+  color: var(--text-dim);
+  background: var(--sb-hover);
+}
+
+#sidebar-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+#sidebar-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+/* Scrollable list of declarations */
+#sidebar-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: var(--sp-3) 0;
+}
+
+#sidebar-content::-webkit-scrollbar {
+  width: 3px;
+}
+
+#sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--ghost-strong);
+  border-radius: 2px;
+}
+
+/* Footer showing generation timestamp */
+#sidebar-footer {
+  padding: var(--sp-3) var(--sp-5);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* File/module groups in the sidebar */
+.toc-group {
+  margin-bottom: 2px;
+}
+
+/* Clickable file/module header */
+.toc-pkg {
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  gap: var(--sp-2);
+  transition: color 0.15s;
+}
+
+.toc-pkg-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-pkg:hover {
+  color: var(--text);
+}
+
+/* Collapse/expand arrow */
+.toc-arrow {
+  font-size: 0.65rem;
+  opacity: 0.4;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* List of symbols within each file */
+.toc-list {
+  list-style: none;
+  padding: 0 0 var(--sp-2) 0;
+  overflow: hidden;
+  max-height: 2000px;
+  opacity: 1;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease,
+    padding 0.2s ease;
+}
+
+.toc-list.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* Individual sidebar links */
+.toc-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px var(--sp-5) 4px var(--sp-6);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--sb-text);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 2px solid transparent;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+  border-radius: 0;
+}
+
+.toc-link:hover {
+  background: var(--sb-hover);
+  color: var(--text);
+}
+
+.toc-link.active {
+  color: var(--text);
+  background: var(--sb-hover);
+  font-weight: 500;
+  border-left-color: var(--sb-active-bar);
+}
+
+/* Color-coded left border for each symbol type */
+.toc-link.toc-struct {
+  border-left-color: var(--badge-struct-fg);
+}
+
+.toc-link.toc-enum {
+  border-left-color: var(--badge-enum-fg);
+}
+
+.toc-link.toc-proc {
+  border-left-color: var(--badge-proc-fg);
+}
+
+.toc-link.toc-union {
+  border-left-color: var(--badge-union-fg);
+}
+
+/* Type indicator icon */
+.toc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+  letter-spacing: 0;
+  font-family: var(--font-display);
+}
+
+.toc-icon-struct {
+  background: var(--badge-struct);
+  color: var(--badge-struct-fg);
+}
+
+.toc-icon-enum {
+  background: var(--badge-enum);
+  color: var(--badge-enum-fg);
+}
+
+.toc-icon-proc {
+  background: var(--badge-proc);
+  color: var(--badge-proc-fg);
+}
+
+.toc-icon-union {
+  background: var(--badge-union);
+  color: var(--badge-union-fg);
+}
+
+.toc-link-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-pkg-count {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+/* Highlight matching search text in sidebar */
+.search-hl {
+  background: var(--accent-dim);
+  color: var(--text);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Main content area */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Top header with project title and GitHub link */
+header {
+  padding: var(--sp-5) var(--sp-8) var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: rgba(19, 19, 19, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 5;
+}
+
+#header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+#title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+#title-sub {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  background: var(--surface-high);
+  padding: 2px 8px;
+  border-radius: var(--r-md);
+}
+
+/* GitHub repository link */
+#github-link {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  opacity: 0.5;
+  transition:
+    opacity 0.2s,
+    color 0.2s;
+  flex-shrink: 0;
+}
+
+#github-link:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+#github-link svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.tagline {
+  font-family: var(--font-body);
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  margin-top: 3px;
+}
+
+/* Buttons throughout the interface */
+button {
+  background: none;
+  border: 1px solid var(--ghost-strong);
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: var(--r-md);
+  padding: 5px 8px;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.15s;
+}
+
+button:hover {
+  background: var(--surface-high);
+  color: var(--text);
+  border-color: var(--ghost-strong);
+}
+
+button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.icon-btn {
+  font-size: 0.95rem;
+  padding: 4px 9px;
+  border: none;
+}
+
+/* Toolbar with search and filter buttons */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-8);
+  flex-shrink: 0;
+  background: rgba(19, 19, 19, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+  z-index: 4;
+  box-shadow: 0 1px 0 var(--ghost);
+}
+
+/* Search input field */
+#search {
+  flex: 1;
+  min-width: 160px;
+  background: var(--surface-highest);
+  border: none;
+  border-radius: var(--r-xl);
+  padding: 7px 14px;
+  color: var(--text);
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: box-shadow 0.2s;
+}
+
+#search:focus {
+  box-shadow:
+    0 0 0 2px var(--accent-dim),
+    inset 0 0 0 1px var(--accent);
+}
+
+#search::placeholder {
+  color: var(--text-faint);
+}
+
+#filter-btns {
+  display: flex;
+  gap: 4px;
+}
+
+#toolbar-right {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* Category filter buttons */
+.filter-btn {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border: 1px solid var(--ghost-strong);
+  border-radius: var(--r-md);
+  letter-spacing: 0.02em;
+}
+
+.filter-count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  opacity: 0.55;
+  margin-left: 3px;
+}
+
+.filter-btn.active {
+  background: var(--btn-color, var(--accent));
+  border-color: var(--btn-color, var(--accent));
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+.filter-btn.active .filter-count {
+  opacity: 0.7;
+}
+
+/* Main scrollable content area */
+#api-root {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 var(--sp-8) var(--sp-16);
+}
+
+#api-root::-webkit-scrollbar {
+  width: 5px;
+}
+
+#api-root::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#api-root::-webkit-scrollbar-thumb {
+  background: var(--ghost-strong);
+  border-radius: 3px;
+}
+
+/* File sections — groups of related symbols */
+.file-section {
+  margin-top: var(--sp-12);
+}
+
+.file-section:first-child {
+  margin-top: var(--sp-8);
+}
+
+/* File name header */
+.file-header {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--surface-low);
+  padding: var(--sp-3) var(--sp-5);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+
+.file-sym-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+/* Declaration details — expandable symbol containers */
+details {
+  background: var(--surface-low);
+  transition: background 0.12s;
+  border-radius: 0;
+  box-shadow: inset 0 1px 0 var(--ghost);
+}
+
+.file-header + details {
+  box-shadow: none;
+}
+
+details:last-child {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+.file-header + details:last-child {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+/* Smooth expand/collapse animation */
+details .content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+  overflow: hidden;
+}
+
+details.is-open .content {
+  grid-template-rows: 1fr;
+}
+
+details .content > * {
+  min-height: 0;
+}
+
+/* Summary row — always visible, clickable to expand */
+summary {
+  padding: var(--sp-4) var(--sp-5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary:hover {
+  background: var(--surface-high);
+}
+
+.item-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+/* Preview of the first doc comment line */
+.item-doc-preview {
+  opacity: 0.6;
+  font-size: 0.85em;
+  margin: 0 0.5em;
+  color: var(--m-gray);
+  align-self: center;
+}
+
+.attr {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--m-orange);
+  opacity: 0.8;
+}
+
+/* Type badge — struct, enum, proc, union */
+.badge {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--r-md);
+  letter-spacing: 0.04em;
+}
+
+.badge-struct {
+  background: var(--badge-struct);
+  color: var(--badge-struct-fg);
+}
+
+.badge-enum {
+  background: var(--badge-enum);
+  color: var(--badge-enum-fg);
+}
+
+.badge-proc {
+  background: var(--badge-proc);
+  color: var(--badge-proc-fg);
+}
+
+.badge-union {
+  background: var(--badge-union);
+  color: var(--badge-union-fg);
+}
+
+/* Doc comments section */
+.doc-text {
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-lowest);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* Parameters and return types section */
+.sig-bar {
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--surface-lowest);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  overflow-x: auto;
+}
+
+.sig-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.sig-val {
+  color: var(--text);
+}
+
+.sig-ret {
+  color: var(--m-teal);
+}
+
+.sig-param-name {
+  color: var(--text-dim);
+}
+
+.sig-param-type {
+  color: var(--m-blue);
+  font-style: italic;
+}
+
+.sig-colon {
+  color: var(--text-faint);
+}
+
+.sig-comma {
+  color: var(--text-faint);
+}
+
+/* "Used by" references — where this symbol is called from */
+.refs-bar {
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--surface-lowest);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.refs-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-right: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.ref-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  border-radius: var(--r-md);
+  background: var(--accent-dim);
+  transition: background 0.12s;
+}
+
+.ref-link:hover {
+  background: rgba(157, 202, 255, 0.22);
+}
+
+/* Code block container */
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-5) var(--sp-2) var(--sp-5);
+  background: var(--m-bg-header);
+}
+
+.code-file {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--m-gray);
+}
+
+/* Copy to clipboard button */
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  border: none;
+  padding: 3px 8px;
+  color: var(--m-gray);
+  background: transparent;
+  border-radius: var(--r-sm);
+  transition:
+    color 0.12s,
+    background 0.12s;
+}
+
+.copy-btn:hover {
+  color: var(--m-fg);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.copy-btn.copied {
+  color: var(--m-green) !important;
+}
+
+/* Syntax highlighted code block */
+.content pre {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-5);
+  background: var(--m-bg);
+  white-space: pre;
+  overflow-x: auto;
+  tab-size: 4;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+details:last-child .content pre {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+.content code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--m-fg);
+  background: none;
+  white-space: pre;
+}
+
+/* Cross-reference links within code */
+.sym-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+
+.sym-link:hover {
+  opacity: 1;
+  border-bottom-style: solid;
+}
+
+/* Flash animation when symbol is navigated to */
+@keyframes sym-flash {
+  0% {
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 16px var(--accent-dim);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px transparent,
+      0 0 0 transparent;
+  }
+}
+
+details.flash {
+  animation: sym-flash 0.9s ease-out forwards;
+}
+
+/* "No results" message when search returns nothing */
+#no-results {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  z-index: 10;
+}
+
+#no-results[aria-hidden="true"] {
+  opacity: 0;
+}
+
+#no-results[aria-hidden="false"] {
+  opacity: 1;
+}
+
+#no-results-icon {
+  font-size: 2.8rem;
+  color: var(--text-faint);
+  margin-bottom: var(--sp-3);
+}
+
+#no-results-text {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: var(--sp-1);
+}
+
+#no-results-sub {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+/* Mobile and tablet responsive styles */
+@media (max-width: 700px) {
+  #sidebar {
+    display: none;
+  }
+  #sidebar-resize {
+    display: none;
+  }
+  #sidebar-toggle {
+    display: none;
+  }
+  body {
+    overflow: auto;
+  }
+  #main {
+    overflow: visible;
+  }
+  #api-root {
+    overflow: visible;
+    padding: 0 var(--sp-4) var(--sp-12);
+  }
+  header {
+    padding: var(--sp-4);
+  }
+  #toolbar {
+    padding: var(--sp-3) var(--sp-4);
+  }
+  .filter-count {
+    display: none;
+  }
+  h1 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 580px) {
+  .item-doc-preview {
+    display: none;
+  }
+}
+</style>">
+    <link rel="stylesheet" href="<style>/* ============================================================================
+   Odin Obsidian — Theme
+
+   Color palette for syntax highlighting and symbol badges.
+   Works alongside obsidian.css for a cohesive design system.
+   ============================================================================ */
+
+:root {
+  /* Code block colors — used for syntax highlighting */
+  --m-bg: #0e0e0e;
+  --m-bg-header: #181818;
+  --m-fg: #c6c6c7;
+  --m-pink: #ffb2bd;
+  --m-green: #a8d5a2;
+  --m-blue: #9dcaff;
+  --m-yellow: #f5d991;
+  --m-gray: #5a5a6a;
+  --m-purple: #c4a5f0;
+  --m-orange: #f0b080;
+  --m-teal: #7ed4c8;
+  --m-red: #ffb2bd;
+  --m-sky: #89c9de;
+  --m-mauve: #c4a5f0;
+  --m-peach: #f0b080;
+  /* Badge backgrounds and text colors for symbol types */
+  --badge-struct: rgba(157, 202, 255, 0.12);
+  --badge-struct-fg: #9dcaff;
+  --badge-enum: rgba(168, 213, 162, 0.12);
+  --badge-enum-fg: #a8d5a2;
+  --badge-proc: rgba(255, 178, 189, 0.12);
+  --badge-proc-fg: #ffb2bd;
+  --badge-union: rgba(196, 165, 240, 0.12);
+  --badge-union-fg: #c4a5f0;
+}
+
+/* Syntax highlighting for code blocks */
+
+/* Comments — dimmed and italicized */
+.hl-cm {
+  color: var(--m-gray);
+  font-style: italic;
+}
+
+/* String literals — green */
+.hl-str {
+  color: var(--m-green);
+}
+
+/* Language keywords — bold mauve */
+.hl-kw {
+  color: var(--m-mauve);
+  font-weight: 600;
+}
+
+/* Type names — blue */
+.hl-ty {
+  color: var(--m-blue);
+}
+
+/* Function/procedure names — blue */
+.hl-fn {
+  color: var(--m-blue);
+}
+
+/* Built-in functions and procs — italicized teal */
+.hl-bi {
+  color: var(--m-teal);
+  font-style: italic;
+}
+
+/* Boolean and nil literals — peach */
+.hl-bl {
+  color: var(--m-peach);
+}
+
+/* Numeric literals — peach */
+.hl-nm {
+  color: var(--m-peach);
+}
+
+/* Directives like #include — sky blue */
+.hl-dr {
+  color: var(--m-sky);
+}
+
+/* Attributes like @private — italicized sky blue */
+.hl-at {
+  color: var(--m-sky);
+  font-style: italic;
+}
+
+/* Operators — subtle foreground */
+.hl-op {
+  color: var(--m-fg);
+  opacity: 0.5;
+}
+
+/* Double colon :: — pink with reduced opacity */
+.hl-dc {
+  color: var(--m-pink);
+  opacity: 0.65;
+}
+
+/* Colon-equals := — pink with reduced opacity */
+.hl-as {
+  color: var(--m-pink);
+  opacity: 0.65;
+}
+
+/* Pointer symbol ^ — pink */
+.hl-pt {
+  color: var(--m-pink);
+  opacity: 0.7;
+}
+
+/* Return arrow -> — teal */
+.hl-ar {
+  color: var(--m-teal);
+  opacity: 0.85;
+}
+</style>">
+</head>
+<body>
+
+<script id="toc-data"  type="application/json">{"main.odin":[{"id":"main.odin--analyze_cross_references","name":"analyze_cross_references","cat":"proc"},{"id":"main.odin--collect_declarations","name":"collect_declarations","cat":"proc"},{"id":"main.odin--main","name":"main","cat":"proc"}],"parser.odin":[{"id":"parser.odin--Declaration","name":"Declaration","cat":"struct"},{"id":"parser.odin--Metadata","name":"Metadata","cat":"struct"},{"id":"parser.odin--Parameter","name":"Parameter","cat":"struct"},{"id":"parser.odin--Signature","name":"Signature","cat":"struct"},{"id":"parser.odin--extract_file_name","name":"extract_file_name","cat":"proc"},{"id":"parser.odin--extract_preceding_metadata","name":"extract_preceding_metadata","cat":"proc"},{"id":"parser.odin--extract_signature","name":"extract_signature","cat":"proc"},{"id":"parser.odin--get_code_block","name":"get_code_block","cat":"proc"},{"id":"parser.odin--parse_declarations","name":"parse_declarations","cat":"proc"},{"id":"parser.odin--parse_signature","name":"parse_signature","cat":"proc"},{"id":"parser.odin--split_params","name":"split_params","cat":"proc"}],"template.odin":[{"id":"template.odin--Syntax","name":"Syntax","cat":"struct"},{"id":"template.odin--Toc_Item","name":"Toc_Item","cat":"struct"},{"id":"template.odin--build_highlight_rules","name":"build_highlight_rules","cat":"proc"},{"id":"template.odin--build_toc_json","name":"build_toc_json","cat":"proc"},{"id":"template.odin--declaration_to_html","name":"declaration_to_html","cat":"proc"},{"id":"template.odin--escape_html","name":"escape_html","cat":"proc"},{"id":"template.odin--generate_content_html","name":"generate_content_html","cat":"proc"},{"id":"template.odin--generate_html","name":"generate_html","cat":"proc"},{"id":"template.odin--strip_comment_prefix","name":"strip_comment_prefix","cat":"proc"}],"config.odin":[{"id":"config.odin--Config","name":"Config","cat":"struct"},{"id":"config.odin--load_config","name":"load_config","cat":"proc"}]}</script>
+<script id="meta-data" type="application/json">{"item_count":25,"generated_at":"30-03-2026"}</script>
+
+<aside id="sidebar">
+    <div id="sidebar-header">
+        <span id="sidebar-title">Odin Doc Generator</span>
+        <span id="sidebar-count"></span>
+        <div id="sidebar-header-btns">
+            <button id="sb-expand-all"   title="Expand all groups">&#8862;</button>
+            <button id="sb-collapse-all" title="Collapse all groups">&#8863;</button>
+        </div>
+    </div>
+    <div id="sidebar-content"></div>
+    <div id="sidebar-footer">Generated <span id="gen-time"></span></div>
+</aside>
+
+<div id="sidebar-resize" title="Drag to resize sidebar"></div>
+
+<main id="main">
+    <header>
+        <div id="header-left">
+            <button id="sidebar-toggle" class="icon-btn" title="Toggle sidebar (S)">&#9776;</button>
+            <div>
+                <div id="title-row">
+                    <h1>Odin Doc Generator <span id="title-sub">1.0.0</span></h1>
+                    <a id="github-link" href="https://github.com/DarthMarino/odin-doc-generator" target="_blank" rel="noopener" title="View on GitHub">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    </a>
+                </div>
+                <div class="tagline">Single-page API documentation generator for Odin projects. Fast, beautiful, interactive.</div>
+            </div>
+        </div>
+    </header>
+
+    <div id="toolbar">
+        <input type="text" id="search" placeholder="Search symbols..." autocomplete="off" spellcheck="false">
+        <div id="filter-btns">
+            <button class="filter-btn active" data-cat="ALL">All <span class="filter-count"></span></button>
+            <button class="filter-btn" data-cat="STRUCT" style="--btn-color:var(--badge-struct-fg)">Struct <span class="filter-count"></span></button>
+            <button class="filter-btn" data-cat="ENUM"   style="--btn-color:var(--badge-enum-fg)">Enum <span class="filter-count"></span></button>
+            <button class="filter-btn" data-cat="PROC"   style="--btn-color:var(--badge-proc-fg)">Proc <span class="filter-count"></span></button>
+            <button class="filter-btn" data-cat="UNION"  style="--btn-color:var(--badge-union-fg)">Union <span class="filter-count"></span></button>
+        </div>
+        <div id="toolbar-right">
+            <button id="back-btn"     title="Go back (Alt+Left)" disabled>&#8592;</button>
+            <button id="expand-all"   title="Expand all">&#8862;</button>
+            <button id="collapse-all" title="Collapse all">&#8863;</button>
+        </div>
+    </div>
+
+    <div id="api-root">
+    <div class="file-section">
+        <div class="file-header">config.odin</div>
+        <details id="config.odin--Config">
+    <summary>
+        <span class="item-name">Config</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#template.odin--generate_html">generate_html</a>
+        <a class="ref-link" href="#config.odin--load_config">load_config</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">config.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Config :: struct {
+	project:    struct {
+		name:        string,
+		version:     string,
+		description: string,
+		repository:  string,
+		page_title:  string,
+	},
+	paths:      struct {
+		source_dir:   string,
+		output_html:  string,
+		template_dir: string,
+		syntax_json:  string,
+		style_css:    string,
+		theme_css:    string,
+	},
+	sort_order: map[string]int,
+}</code></pre>
+    </div>
+</details>
+        <details id="config.odin--load_config">
+    <summary>
+        <span class="item-name">load_config</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">config_path: string</span>
+    </div>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#main.odin--main">main</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">config.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">load_config :: proc(config_path: string) -&gt; Config {
+	config_bytes, err := os.read_entire_file(config_path, context.allocator)
+	if err != nil {
+		fmt.panicf(&quot;Error: could not read config file -&gt; %s\n&quot;, config_path)
+	}
+	config := Config{}
+	unmarshal_err := json.unmarshal(config_bytes, &amp;config)
+	if unmarshal_err != nil {
+		fmt.panicf(&quot;Error: could not parse config file -&gt; %s\n&quot;, config_path)
+	}
+
+	return config
+}</code></pre>
+    </div>
+</details>
+    </div>
+    <div class="file-section">
+        <div class="file-header">main.odin</div>
+        <details id="main.odin--analyze_cross_references">
+    <summary>
+        <span class="item-name">analyze_cross_references</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">declarations: [dynamic]Declaration</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">main.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">analyze_cross_references :: proc(declarations: [dynamic]Declaration) {
+	name_to_decl := map[string]Declaration{}
+	for decl in declarations {
+		name_to_decl[decl.name] = decl
+	}
+
+	for decl, i in declarations {
+		ident_pattern := `\b([A-Za-z_]\w*)\b`
+		re, _ := regex.create_iterator(decl.code_block, ident_pattern)
+		defer regex.destroy(re)
+
+		added: map[string]bool
+
+		for {
+			capt, _, ok := regex.match_iterator(&amp;re)
+			if !ok {break}
+
+			ident := capt.groups[1]
+
+			if other_decl, found := name_to_decl[ident]; found &amp;&amp; other_decl.name != decl.name {
+				ref_id := strings.concatenate({decl.file, &quot;--&quot;, decl.name}, context.allocator)
+
+				// Only add if we haven&#39;t already
+				if !added[ref_id] {
+					for other, j in declarations {
+						if other.name == other_decl.name {
+							append(&amp;declarations[j].used_by, ref_id)
+							added[ref_id] = true
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+}</code></pre>
+    </div>
+</details>
+        <details id="main.odin--collect_declarations">
+    <summary>
+        <span class="item-name">collect_declarations</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">dir: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">main.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">collect_declarations :: proc(dir: string) -&gt; [dynamic]Declaration {
+	entries, dir_err := os.read_directory_by_path(dir, 0, context.allocator)
+	if dir_err != nil {
+		fmt.panicf(&quot;Error: could not read directory -&gt; %s\n&quot;, dir)
+	}
+
+	declarations := make([dynamic]Declaration, context.allocator)
+	for entry in entries {
+		if entry.type == os.File_Type.Directory {
+			continue
+		}
+		if !strings.has_suffix(entry.name, &quot;.odin&quot;) {
+			continue
+		}
+		file_path := strings.concatenate({dir, &quot;/&quot;, entry.name}, context.allocator)
+		for decl in parse_declarations(file_path) {
+			append(&amp;declarations, decl)
+		}
+	}
+	return declarations
+}</code></pre>
+    </div>
+</details>
+        <details id="main.odin--main">
+    <summary>
+        <span class="item-name">main</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">main.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">main :: proc() {
+	args := os.args
+
+	dir := &quot;.&quot;
+	config_path := &quot;./config.json&quot;
+	embed := false
+
+	for i := 1; i &lt; len(args); i += 1 {
+		if args[i] == &quot;--dir&quot; &amp;&amp; i + 1 &lt; len(args) {
+			dir = args[i + 1]
+			break
+		}
+		if args[i] == &quot;--config&quot; &amp;&amp; i + 1 &lt; len(args) {
+			config_path = args[i + 1]
+		}
+		if args[i] == &quot;--embed&quot; {
+			embed = true
+		}
+	}
+
+	config := load_config(config_path)
+
+	// Verify source directory exists
+	stat, err := os.stat(dir, context.allocator)
+	if err != nil {
+		fmt.panicf(&quot;Error: directory not found -&gt; %s\n&quot;, dir)
+	}
+	if stat.type != os.File_Type.Directory {
+		fmt.panicf(&quot;Error: path is not a directory -&gt; %s\n&quot;, dir)
+	}
+
+	all_declarations := collect_declarations(dir)
+
+	// Analyze cross-references across all files
+	analyze_cross_references(all_declarations)
+
+	template_path := strings.concatenate(
+		{config.paths.template_dir, &quot;/template.html&quot;},
+		context.temp_allocator,
+	)
+	html_output := generate_html(template_path, config, all_declarations, embed)
+
+	output_path := config.paths.output_html
+	output_dir := filepath.dir(output_path, context.temp_allocator)
+	os.make_directory(output_dir)
+	err = os.write_entire_file(output_path, transmute([]byte)html_output)
+	if err != nil {
+		fmt.panicf(&quot;Error: could not write output file -&gt; %s\n&quot;, output_path)
+	}
+
+	fmt.printf(&quot;Done: HTML generated -&gt; %s\n&quot;, output_path)
+}</code></pre>
+    </div>
+</details>
+    </div>
+    <div class="file-section">
+        <div class="file-header">parser.odin</div>
+        <details id="parser.odin--Declaration">
+    <summary>
+        <span class="item-name">Declaration</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#parser.odin--parse_declarations">parse_declarations</a>
+        <a class="ref-link" href="#template.odin--build_toc_json">build_toc_json</a>
+        <a class="ref-link" href="#template.odin--declaration_to_html">declaration_to_html</a>
+        <a class="ref-link" href="#template.odin--generate_content_html">generate_content_html</a>
+        <a class="ref-link" href="#main.odin--collect_declarations">collect_declarations</a>
+        <a class="ref-link" href="#main.odin--analyze_cross_references">analyze_cross_references</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Declaration :: struct {
+	name:       string,
+	cat:        string,
+	file:       string,
+	metadata:   Metadata,
+	signature:  Signature,
+	code_block: string,
+	used_by:    [dynamic]string,
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--Metadata">
+    <summary>
+        <span class="item-name">Metadata</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#parser.odin--Declaration">Declaration</a>
+        <a class="ref-link" href="#parser.odin--extract_preceding_metadata">extract_preceding_metadata</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Metadata :: struct {
+	comments:   [dynamic]string,
+	attributes: [dynamic]string,
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--Parameter">
+    <summary>
+        <span class="item-name">Parameter</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#parser.odin--Signature">Signature</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Parameter :: struct {
+	name: string,
+	type: string,
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--Signature">
+    <summary>
+        <span class="item-name">Signature</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#parser.odin--parse_signature">parse_signature</a>
+        <a class="ref-link" href="#parser.odin--extract_signature">extract_signature</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Signature :: struct {
+	parameters:  [dynamic]Parameter,
+	return_type: string,
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--extract_file_name">
+    <summary>
+        <span class="item-name">extract_file_name</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">file_path: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">extract_file_name :: proc(file_path: string) -&gt; string {
+	last_slash := strings.last_index(file_path, &quot;/&quot;)
+	file_name: string
+	if last_slash != -1 {
+		file_name = file_path[last_slash + 1:]
+	} else {
+		file_name = file_path
+	}
+	return file_name
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--extract_preceding_metadata">
+    <summary>
+        <span class="item-name">extract_preceding_metadata</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">lines: []string, line_number: int</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">extract_preceding_metadata :: proc(lines: []string, line_number: int) -&gt; Metadata {
+	metadata: Metadata
+
+	for i := line_number - 1; i &gt;= 0; i -= 1 {
+		line := strings.trim_space(lines[i])
+		if len(line) == 0 {
+			break
+		}
+		// Check if its a comment or an attribute
+		if strings.has_prefix(line, &quot;//&quot;) {
+			append(&amp;metadata.comments, line)
+		} else if strings.has_prefix(line, &quot;@&quot;) {
+			append(&amp;metadata.attributes, line)
+		} else {
+			break
+		}
+	}
+	return metadata
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--extract_signature">
+    <summary>
+        <span class="item-name">extract_signature</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">code_block: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">extract_signature :: proc(code_block: string) -&gt; Signature {
+	// Find &quot;proc(&quot;
+	proc_idx := strings.index(code_block, &quot;proc(&quot;)
+	if proc_idx == -1 {
+		fmt.printf(&quot;Error, no proc was found on this block.&quot;)
+
+	}
+	closing_params_idx: int
+	depth := 1
+	for i := proc_idx + 5; i &lt; len(code_block); i += 1 {
+		char := code_block[i]
+		if char == &#39;(&#39; {
+			depth += 1
+		} else if char == &#39;)&#39; {
+			depth -= 1
+		}
+		if char == &#39;)&#39; &amp;&amp; depth == 0 {
+			closing_params_idx = i
+			break
+		}
+	}
+	// Extract parameter string
+	param_string := code_block[proc_idx + 5:closing_params_idx]
+
+	// Extract return type string
+	return_type_idx := strings.index(code_block[closing_params_idx:], &quot;-&gt;&quot;)
+	return_type_string: string
+	if return_type_idx == -1 {
+		return_type_string = &quot;&quot;
+	} else {
+		return_type_idx += closing_params_idx
+		return_type_string = code_block[return_type_idx + 2:]
+
+		for i := 0; i &lt; len(return_type_string); i += 1 {
+			if return_type_string[i] == &#39;{&#39; {
+				return_type_string = return_type_string[:i]
+				break
+			}
+		}
+	}
+	// Call parse_signature()
+	return parse_signature(param_string, return_type_string)
+}
+
+get_code_block :: proc(content: string, start_pos: int) -&gt; string {
+	brace_idx := strings.index(content[start_pos:], &quot;{&quot;)
+	if brace_idx == -1 {
+		return &quot;&quot;
+	}
+	brace_idx += start_pos
+	// Count braces to find matching }
+	depth := 1
+	closing_brace_idx := -1
+	for i := brace_idx + 1; i &lt; len(content); i += 1 {
+		char := content[i]
+		if char == &#39;{&#39; {
+			depth += 1
+		} else if char == &#39;}&#39; {
+			depth -= 1
+		}
+		if char == &#39;}&#39; &amp;&amp; depth == 0 {
+			closing_brace_idx = i
+			break
+		}
+	}
+	return content[start_pos:closing_brace_idx + 1]
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--get_code_block">
+    <summary>
+        <span class="item-name">get_code_block</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">content: string, start_pos: int</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">get_code_block :: proc(content: string, start_pos: int) -&gt; string {
+	brace_idx := strings.index(content[start_pos:], &quot;{&quot;)
+	if brace_idx == -1 {
+		return &quot;&quot;
+	}
+	brace_idx += start_pos
+	// Count braces to find matching }
+	depth := 1
+	closing_brace_idx := -1
+	for i := brace_idx + 1; i &lt; len(content); i += 1 {
+		char := content[i]
+		if char == &#39;{&#39; {
+			depth += 1
+		} else if char == &#39;}&#39; {
+			depth -= 1
+		}
+		if char == &#39;}&#39; &amp;&amp; depth == 0 {
+			closing_brace_idx = i
+			break
+		}
+	}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--parse_declarations">
+    <summary>
+        <span class="item-name">parse_declarations</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">file_path: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">parse_declarations :: proc(file_path: string) -&gt; [dynamic]Declaration {
+	content_bytes, err := os.read_entire_file(file_path, context.allocator)
+	if err != nil {
+		fmt.panicf(&quot;Error reading %s\n&quot;, file_path)
+	}
+
+	content := string(content_bytes)
+	lines := strings.split(content, &quot;\n&quot;)
+
+	// Regex Pattern
+	pattern := `(\w+)\s*::\s*(proc|struct|enum|union)`
+	re, compile_err := regex.create_iterator(content, pattern)
+	if compile_err != nil {
+		fmt.panicf(&quot;Regex compile error: %v\n&quot;, compile_err)
+	}
+	defer regex.destroy(re)
+
+	declarations := make([dynamic]Declaration, context.allocator)
+
+	for {
+		capt, idx, ok := regex.match_iterator(&amp;re)
+		if !ok {
+			break
+		}
+		name := capt.groups[1]
+		cat := capt.groups[2]
+
+		match_pos := capt.pos[0][0]
+		line_num := strings.count(content[0:match_pos], &quot;\n&quot;)
+
+		metadata := extract_preceding_metadata(lines, line_num)
+
+		code_block := get_code_block(content, match_pos)
+
+		file_name := extract_file_name(file_path)
+
+		signature: Signature
+		if cat == &quot;proc&quot; {
+			signature = extract_signature(code_block)
+		} else {
+			signature = Signature{} // Empty signature for non-procs
+		}
+
+		decl := Declaration {
+			name       = name,
+			cat        = cat,
+			file       = file_name,
+			metadata   = metadata,
+			signature  = signature,
+			code_block = code_block,
+			used_by    = make([dynamic]string, context.allocator),
+		}
+		append(&amp;declarations, decl)
+	}
+	return declarations
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--parse_signature">
+    <summary>
+        <span class="item-name">parse_signature</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">param_string: string, return_type_string: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">parse_signature :: proc(param_string: string, return_type_string: string) -&gt; Signature {
+	params := make([dynamic]Parameter, context.temp_allocator)
+
+	// Split into individual parameters
+	individual_params := split_params(param_string)
+
+	// For each parameter, split by : and extract name and type
+	for param_str in individual_params {
+		trimmed_str := strings.trim_space(param_str)
+		res, err := strings.split(trimmed_str, &quot;:&quot;)
+		if err != nil {
+			fmt.panicf(&quot;Error extracting from the param_string&quot;)
+		}
+
+		// Check that we actually have both name and type
+		if len(res) &lt; 2 {
+			continue
+		}
+
+		param: Parameter
+		param.name = strings.trim_space(res[0])
+		param.type = strings.trim_space(res[1])
+
+		append(&amp;params, param)
+	}
+
+	return Signature{parameters = params, return_type = strings.trim_space(return_type_string)}
+}</code></pre>
+    </div>
+</details>
+        <details id="parser.odin--split_params">
+    <summary>
+        <span class="item-name">split_params</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">param_string: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">parser.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">split_params :: proc(param_string: string) -&gt; [dynamic]string {
+	params := make([dynamic]string, context.temp_allocator)
+	depth := 0
+	current_param := strings.Builder{}
+
+	for char in param_string {
+		if char == &#39;(&#39; {
+			depth += 1
+			strings.write_rune(&amp;current_param, char)
+		} else if char == &#39;)&#39; {
+			depth -= 1
+			strings.write_rune(&amp;current_param, char)
+		} else if char == &#39;,&#39; &amp;&amp; depth == 0 {
+			// Top-level comma, split here
+			param_str := strings.to_string(current_param)
+			append(&amp;params, strings.trim_space(param_str))
+			current_param = strings.Builder{}
+		} else {
+			strings.write_rune(&amp;current_param, char)
+		}
+	}
+
+	// Don&#39;t forget the last parameter
+	if len(current_param.buf) &gt; 0 {
+		append(&amp;params, strings.trim_space(strings.to_string(current_param)))
+	}
+
+	return params
+}</code></pre>
+    </div>
+</details>
+    </div>
+    <div class="file-section">
+        <div class="file-header">template.odin</div>
+        <details id="template.odin--Syntax">
+    <summary>
+        <span class="item-name">Syntax</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="refs-bar">
+        <span class="refs-label">used by</span>
+        <a class="ref-link" href="#template.odin--build_highlight_rules">build_highlight_rules</a>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Syntax :: struct {
+	keywords:      [dynamic]string,
+	builtin_types: [dynamic]string,
+	builtin_procs: [dynamic]string,
+	literals:      [dynamic]string,
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--Toc_Item">
+    <summary>
+        <span class="item-name">Toc_Item</span>
+        <span class="badge badge-struct">STRUCT</span>
+    </summary>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">Toc_Item :: struct {
+	id, name, cat: string,
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--build_highlight_rules">
+    <summary>
+        <span class="item-name">build_highlight_rules</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">syntax: Syntax</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">build_highlight_rules :: proc(syntax: Syntax) -&gt; string {
+	b: strings.Builder
+	strings.write_string(&amp;b, &quot;var RULES = [&quot;)
+
+	// Comments
+	strings.write_string(&amp;b, &quot;{cls: \&quot;cm\&quot;, re: /\\/\\*[\\s\\S]*?\\*\\//g},&quot;)
+	strings.write_string(&amp;b, &quot;{cls: \&quot;cm\&quot;, re: /\\/\\/[^\\n]*/g},&quot;)
+
+	// Strings
+	strings.write_string(&amp;b, &quot;{cls: \&quot;str\&quot;, re: /`[^`]*`/g},&quot;)
+	strings.write_string(&amp;b, &quot;{cls: \&quot;str\&quot;, re: /\&quot;(?:[^\&quot;\\\\]|\\\\.)*\&quot;/g},&quot;)
+
+	// Keywords
+	strings.write_string(&amp;b, &quot;{cls: \&quot;kw\&quot;, re: /\\b(?:&quot;)
+	for kw, i in syntax.keywords {
+		if i &gt; 0 {strings.write_string(&amp;b, &quot;|&quot;)}
+		strings.write_string(&amp;b, kw)
+	}
+	strings.write_string(&amp;b, &quot;)\\b/g},&quot;)
+
+	// Built-in types
+	strings.write_string(&amp;b, &quot;{cls: \&quot;ty\&quot;, re: /\\b(?:&quot;)
+	for typ, i in syntax.builtin_types {
+		if i &gt; 0 {strings.write_string(&amp;b, &quot;|&quot;)}
+		strings.write_string(&amp;b, typ)
+	}
+	strings.write_string(&amp;b, &quot;)\\b/g},&quot;)
+
+	// Built-in procs
+	strings.write_string(&amp;b, &quot;{cls: \&quot;bi\&quot;, re: /\\b(?:&quot;)
+	for procedure, i in syntax.builtin_procs {
+		if i &gt; 0 {
+			strings.write_string(&amp;b, &quot;|&quot;)
+		}
+		strings.write_string(&amp;b, procedure)
+	}
+	strings.write_string(&amp;b, &quot;)\\b/g},&quot;)
+
+	// Literals
+	strings.write_string(&amp;b, &quot;{cls: \&quot;bl\&quot;, re: /\\b(?:&quot;)
+	for lit, i in syntax.literals {
+		if i &gt; 0 {strings.write_string(&amp;b, &quot;|&quot;)}
+		strings.write_string(&amp;b, lit)
+	}
+	strings.write_string(&amp;b, &quot;)\\b/g},&quot;)
+
+	strings.write_string(&amp;b, &quot;];&quot;)
+	return strings.to_string(b)
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--build_toc_json">
+    <summary>
+        <span class="item-name">build_toc_json</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">declarations: [dynamic]Declaration</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">build_toc_json :: proc(declarations: [dynamic]Declaration) -&gt; string {
+	toc := make(map[string][dynamic]Toc_Item, context.temp_allocator)
+	for decl in declarations {
+		if toc[decl.file] == nil {
+			toc[decl.file] = make([dynamic]Toc_Item, context.temp_allocator)
+		}
+		append(
+			&amp;toc[decl.file],
+			Toc_Item {
+				id = strings.concatenate({decl.file, &quot;--&quot;, decl.name}, context.temp_allocator),
+				name = decl.name,
+				cat = decl.cat,
+			},
+		)
+	}
+	// Sort
+	for file, items in toc {
+		slice.sort_by(items[:], proc(a, b: Toc_Item) -&gt; bool {
+			type_a := CURRENT_SORT_ORDER[a.cat]
+			type_b := CURRENT_SORT_ORDER[b.cat]
+			if type_a != type_b {
+				return type_a &lt; type_b
+			}
+			return a.name &lt; b.name
+		})
+	}
+	b: strings.Builder
+	strings.write_string(&amp;b, &quot;{&quot;)
+	i := 0
+	for file, items in toc {
+		if i &gt; 0 {strings.write_string(&amp;b, &quot;,&quot;)}
+		strings.write_string(&amp;b, &quot;\&quot;&quot;)
+		strings.write_string(&amp;b, file)
+		strings.write_string(&amp;b, &quot;\&quot;:[&quot;)
+		for item, j in items {
+			if j &gt; 0 {strings.write_string(&amp;b, &quot;,&quot;)}
+			strings.write_string(&amp;b, &quot;{\&quot;id\&quot;:\&quot;&quot;)
+			strings.write_string(&amp;b, item.id)
+			strings.write_string(&amp;b, &quot;\&quot;,\&quot;name\&quot;:\&quot;&quot;)
+			strings.write_string(&amp;b, item.name)
+			strings.write_string(&amp;b, &quot;\&quot;,\&quot;cat\&quot;:\&quot;&quot;)
+			strings.write_string(&amp;b, item.cat)
+			strings.write_string(&amp;b, &quot;\&quot;}&quot;)
+		}
+		strings.write_string(&amp;b, &quot;]&quot;)
+		i += 1
+	}
+	strings.write_string(&amp;b, &quot;}&quot;)
+	return strings.to_string(b)
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--declaration_to_html">
+    <summary>
+        <span class="item-name">declaration_to_html</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">decl: Declaration</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">declaration_to_html :: proc(decl: Declaration) -&gt; string {
+	b: strings.Builder
+
+	strings.write_string(&amp;b, `&lt;details id=&quot;`)
+	strings.write_string(&amp;b, decl.file)
+	strings.write_string(&amp;b, `--`)
+	strings.write_string(&amp;b, decl.name)
+	strings.write_string(&amp;b, `&quot;&gt;`)
+
+	strings.write_string(&amp;b, &quot;\n    &lt;summary&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n        &lt;span class=\&quot;item-name\&quot;&gt;&quot;)
+	strings.write_string(&amp;b, decl.name)
+	strings.write_string(&amp;b, &quot;&lt;/span&gt;&quot;)
+
+	if len(decl.metadata.comments) &gt; 0 {
+		strings.write_string(&amp;b, &quot;\n        &lt;span class=\&quot;item-doc-preview\&quot;&gt;&quot;)
+		text := strings.trim_space(strip_comment_prefix(decl.metadata.comments[len(decl.metadata.comments) - 1]))
+		if len(text) &gt; 50 {
+			text = text[:50]
+			strings.write_string(&amp;b, text)
+			strings.write_string(&amp;b, &quot;...&quot;)
+		} else {
+			strings.write_string(&amp;b, text)
+		}
+		strings.write_string(&amp;b, &quot;&lt;/span&gt;&quot;)
+	}
+
+	strings.write_string(&amp;b, &quot;\n        &lt;span class=\&quot;badge badge-&quot;)
+	strings.write_string(&amp;b, decl.cat)
+	strings.write_string(&amp;b, `&quot;&gt;`)
+	strings.write_string(&amp;b, strings.to_upper(decl.cat, context.temp_allocator))
+	strings.write_string(&amp;b, &quot;&lt;/span&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n    &lt;/summary&gt;&quot;)
+
+	if len(decl.metadata.comments) &gt; 0 {
+		strings.write_string(&amp;b, &quot;\n    &lt;div class=\&quot;doc-text\&quot;&gt;&quot;)
+		for i := len(decl.metadata.comments) - 1; i &gt;= 0; i -= 1 {
+			text := strip_comment_prefix(decl.metadata.comments[i])
+			if i &lt; len(decl.metadata.comments) - 1 {
+				strings.write_string(&amp;b, &quot; &quot;)
+			}
+			strings.write_string(&amp;b, text)
+		}
+		strings.write_string(&amp;b, &quot;&lt;/div&gt;&quot;)
+	}
+
+	if len(decl.signature.parameters) &gt; 0 {
+		strings.write_string(&amp;b, &quot;\n    &lt;div class=\&quot;sig-bar\&quot;&gt;&quot;)
+		strings.write_string(&amp;b, &quot;\n        &lt;span class=\&quot;sig-label\&quot;&gt;params&lt;/span&gt;&quot;)
+		strings.write_string(&amp;b, &quot;\n        &lt;span class=\&quot;sig-val\&quot;&gt;&quot;)
+		for param, i in decl.signature.parameters {
+			if i &gt; 0 {
+				strings.write_string(&amp;b, &quot;, &quot;)
+			}
+			strings.write_string(&amp;b, param.name)
+			strings.write_string(&amp;b, &quot;: &quot;)
+			strings.write_string(&amp;b, param.type)
+		}
+		strings.write_string(&amp;b, &quot;&lt;/span&gt;&quot;)
+		strings.write_string(&amp;b, &quot;\n    &lt;/div&gt;&quot;)
+	}
+	if len(decl.used_by) &gt; 0 {
+		strings.write_string(&amp;b, &quot;\n    &lt;div class=\&quot;refs-bar\&quot;&gt;&quot;)
+		strings.write_string(&amp;b, &quot;\n        &lt;span class=\&quot;refs-label\&quot;&gt;used by&lt;/span&gt;&quot;)
+		for ref_id in decl.used_by {
+			strings.write_string(&amp;b, &quot;\n        &lt;a class=\&quot;ref-link\&quot; href=\&quot;#&quot;)
+			strings.write_string(&amp;b, ref_id)
+			strings.write_string(&amp;b, &quot;\&quot;&gt;&quot;)
+			// Extract just the name from &quot;file--name&quot;
+			last_dash := strings.last_index(ref_id, &quot;--&quot;)
+			if last_dash != -1 {
+				strings.write_string(&amp;b, ref_id[last_dash + 2:])
+			} else {
+				strings.write_string(&amp;b, ref_id)
+			}
+			strings.write_string(&amp;b, &quot;&lt;/a&gt;&quot;)
+		}
+		strings.write_string(&amp;b, &quot;\n    &lt;/div&gt;&quot;)
+	}
+	strings.write_string(&amp;b, &quot;\n    &lt;div class=\&quot;content\&quot;&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n        &lt;div class=\&quot;code-header\&quot;&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n            &lt;span class=\&quot;code-file\&quot;&gt;&quot;)
+	strings.write_string(&amp;b, decl.file)
+	strings.write_string(&amp;b, &quot;&lt;/span&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n            &lt;button class=\&quot;copy-btn\&quot;&gt;Copy&lt;/button&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n        &lt;/div&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n        &lt;pre&gt;&lt;code class=\&quot;language-odin\&quot;&gt;&quot;)
+	escaped_code := escape_html(decl.code_block)
+	strings.write_string(&amp;b, escaped_code)
+	strings.write_string(&amp;b, &quot;&lt;/code&gt;&lt;/pre&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n    &lt;/div&gt;&quot;)
+	strings.write_string(&amp;b, &quot;\n&lt;/details&gt;&quot;)
+
+	return strings.to_string(b)
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--escape_html">
+    <summary>
+        <span class="item-name">escape_html</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">s: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">escape_html :: proc(s: string) -&gt; string {
+	b: strings.Builder
+	for char in s {
+		switch char {
+		case &#39;&lt;&#39;:
+			strings.write_string(&amp;b, &quot;&amp;lt;&quot;)
+		case &#39;&gt;&#39;:
+			strings.write_string(&amp;b, &quot;&amp;gt;&quot;)
+		case &#39;&amp;&#39;:
+			strings.write_string(&amp;b, &quot;&amp;amp;&quot;)
+		case &#39;&quot;&#39;:
+			strings.write_string(&amp;b, &quot;&amp;quot;&quot;)
+		case &#39;\&#39;&#39;:
+			strings.write_string(&amp;b, &quot;&amp;#39;&quot;)
+		case:
+			strings.write_rune(&amp;b, char)
+		}
+	}
+	return strings.to_string(b)
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--generate_content_html">
+    <summary>
+        <span class="item-name">generate_content_html</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">declarations: [dynamic]Declaration, sort_order: map[string]int</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">generate_content_html :: proc(
+	declarations: [dynamic]Declaration,
+	sort_order: map[string]int,
+) -&gt; string {
+
+	CURRENT_SORT_ORDER = sort_order
+
+	// Make a copy so we don&#39;t modify the original
+	sorted_decls := make([dynamic]Declaration, context.allocator)
+	for decl in declarations {
+		append(&amp;sorted_decls, decl)
+	}
+
+	slice.sort_by(sorted_decls[:], proc(a, b: Declaration) -&gt; bool {
+		if a.file != b.file {
+			return a.file &lt; b.file
+		}
+		type_a := CURRENT_SORT_ORDER[a.cat]
+		type_b := CURRENT_SORT_ORDER[b.cat]
+		if type_a != type_b {
+			return type_a &lt; type_b
+		}
+		return a.name &lt; b.name
+	})
+
+	// Generate HTML
+	b: strings.Builder
+	current_file := &quot;&quot;
+
+	for decl in sorted_decls {
+		// If file changed, start a new file section
+		if decl.file != current_file {
+			if current_file != &quot;&quot; {
+				strings.write_string(&amp;b, &quot;\n    &lt;/div&gt;&quot;) // Close previous section
+			}
+			current_file = decl.file
+			strings.write_string(&amp;b, &quot;\n    &lt;div class=\&quot;file-section\&quot;&gt;&quot;)
+			strings.write_string(&amp;b, &quot;\n        &lt;div class=\&quot;file-header\&quot;&gt;&quot;)
+			strings.write_string(&amp;b, current_file)
+			strings.write_string(&amp;b, &quot;&lt;/div&gt;&quot;)
+		}
+
+		// Add the declaration
+		strings.write_string(&amp;b, &quot;\n        &quot;)
+		strings.write_string(&amp;b, declaration_to_html(decl))
+	}
+
+	// Close the last section
+	if current_file != &quot;&quot; {
+		strings.write_string(&amp;b, &quot;\n    &lt;/div&gt;&quot;)
+	}
+
+	return strings.to_string(b)
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--generate_html">
+    <summary>
+        <span class="item-name">generate_html</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">template_path: string, config: Config, declarations: [dynamic]Declaration, embed: bool</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">generate_html :: proc(
+	template_path: string,
+	config: Config,
+	declarations: [dynamic]Declaration,
+	embed: bool,
+) -&gt; string {
+	template_bytes, err := os.read_entire_file(template_path, context.allocator)
+	if err != nil {
+		fmt.panicf(&quot;Error: could not read template file -&gt; %s\n&quot;, template_path)
+	}
+
+	template := string(template_bytes)
+	content_html := generate_content_html(declarations, config.sort_order)
+
+
+	replacements := make(map[string]string, context.temp_allocator)
+	replacements[&quot;Odin Doc Generator&quot;] = config.project.name
+	replacements[&quot;1.0.0&quot;] = config.project.version
+	replacements[&quot;Single-page API documentation generator for Odin projects. Fast, beautiful, interactive.&quot;] = config.project.description
+	replacements[&quot;https://github.com/DarthMarino/odin-doc-generator&quot;] = config.project.repository
+	replacements[&quot;Odin Doc Generator&quot;] = config.project.page_title
+	replacements[&quot;{{content}}&quot;] = content_html
+
+	style_content: string
+	if embed {
+		style_bytes, _ := os.read_entire_file(config.paths.style_css, context.allocator)
+		style_content = strings.concatenate(
+			{&quot;&lt;style&gt;&quot;, string(style_bytes), &quot;&lt;/style&gt;&quot;},
+			context.temp_allocator,
+		)
+	} else {
+		style_content = config.paths.style_css
+	}
+	replacements[&quot;<style>/* ============================================================================
+   Odin Obsidian — Style System
+
+   A refined design system for API documentation.
+   Built on tonal layering, subtle blur effects, and generous spacing.
+   ============================================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+/* Design tokens — the foundation of the visual language */
+:root {
+  /* Color palette — carefully balanced for dark mode */
+  --bg: #131313;
+  --surface: #131313;
+  --surface-low: #1c1b1b;
+  --surface-lowest: #0e0e0e;
+  --surface-high: #2a2a2a;
+  --surface-highest: #333333;
+
+  /* Text hierarchy — from primary to hint */
+  --text: #e5e2e1;
+  --text-dim: #8e8c8b;
+  --text-faint: #6c6c6c;
+  --text-inverse: #131313;
+
+  /* Accent colors for interactive elements */
+  --accent: #9dcaff;
+  --accent-dim: rgba(157, 202, 255, 0.15);
+  --accent-glow: rgba(157, 202, 255, 0.08);
+
+  /* Secondary brand color */
+  --secondary: #ffb2bd;
+  --secondary-container: #ca0350;
+
+  /* Subtle separators — no hard borders */
+  --ghost: rgba(255, 255, 255, 0.06);
+  --ghost-strong: rgba(255, 255, 255, 0.1);
+
+  /* Sidebar-specific colors */
+  --sb-bg: #1c1b1b;
+  --sb-text: #8e8c8b;
+  --sb-hover: #252424;
+  --sb-active-bar: var(--accent);
+
+  /* Depth and shadows */
+  --shadow-ambient: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  /* Border radius scale */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+  --r-xl: 12px;
+
+  /* Spacing scale — consistent throughout */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.65rem;
+  --sp-4: 0.9rem;
+  --sp-5: 1.1rem;
+  --sp-6: 1.4rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+
+  /* Font families */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
+
+  /* Type badge backgrounds and text colors */
+  --badge-struct: rgba(157, 202, 255, 0.12);
+  --badge-struct-fg: #9dcaff;
+  --badge-enum: rgba(168, 213, 162, 0.12);
+  --badge-enum-fg: #a8d5a2;
+  --badge-proc: rgba(255, 178, 189, 0.12);
+  --badge-proc-fg: #ffb2bd;
+  --badge-union: rgba(196, 165, 240, 0.12);
+  --badge-union-fg: #c4a5f0;
+}
+
+/* Reset all elements to a consistent baseline */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sidebar — left navigation panel */
+#sidebar {
+  width: 260px;
+  min-width: 220px;
+  background: var(--sb-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    width 0.25s ease,
+    min-width 0.25s ease,
+    opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+#sidebar.hidden {
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Resize handle between sidebar and main content */
+#sidebar-resize {
+  width: 3px;
+  cursor: col-resize;
+  background: transparent;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+#sidebar-resize:hover,
+#sidebar-resize.dragging {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-dim);
+}
+
+/* Sidebar header with project name and controls */
+#sidebar-header {
+  padding: var(--sp-5) var(--sp-4) var(--sp-4) var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-shrink: 0;
+  background: var(--sb-bg);
+}
+
+#sidebar-header-btns {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+#sidebar-header-btns button {
+  font-size: 0.75rem;
+  padding: 3px 6px;
+  border: none;
+  background: none;
+  color: var(--text-faint);
+  border-radius: var(--r-sm);
+}
+
+#sidebar-header-btns button:hover {
+  color: var(--text-dim);
+  background: var(--sb-hover);
+}
+
+#sidebar-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+#sidebar-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+/* Scrollable list of declarations */
+#sidebar-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: var(--sp-3) 0;
+}
+
+#sidebar-content::-webkit-scrollbar {
+  width: 3px;
+}
+
+#sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--ghost-strong);
+  border-radius: 2px;
+}
+
+/* Footer showing generation timestamp */
+#sidebar-footer {
+  padding: var(--sp-3) var(--sp-5);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* File/module groups in the sidebar */
+.toc-group {
+  margin-bottom: 2px;
+}
+
+/* Clickable file/module header */
+.toc-pkg {
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  gap: var(--sp-2);
+  transition: color 0.15s;
+}
+
+.toc-pkg-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-pkg:hover {
+  color: var(--text);
+}
+
+/* Collapse/expand arrow */
+.toc-arrow {
+  font-size: 0.65rem;
+  opacity: 0.4;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* List of symbols within each file */
+.toc-list {
+  list-style: none;
+  padding: 0 0 var(--sp-2) 0;
+  overflow: hidden;
+  max-height: 2000px;
+  opacity: 1;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease,
+    padding 0.2s ease;
+}
+
+.toc-list.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* Individual sidebar links */
+.toc-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px var(--sp-5) 4px var(--sp-6);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--sb-text);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 2px solid transparent;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+  border-radius: 0;
+}
+
+.toc-link:hover {
+  background: var(--sb-hover);
+  color: var(--text);
+}
+
+.toc-link.active {
+  color: var(--text);
+  background: var(--sb-hover);
+  font-weight: 500;
+  border-left-color: var(--sb-active-bar);
+}
+
+/* Color-coded left border for each symbol type */
+.toc-link.toc-struct {
+  border-left-color: var(--badge-struct-fg);
+}
+
+.toc-link.toc-enum {
+  border-left-color: var(--badge-enum-fg);
+}
+
+.toc-link.toc-proc {
+  border-left-color: var(--badge-proc-fg);
+}
+
+.toc-link.toc-union {
+  border-left-color: var(--badge-union-fg);
+}
+
+/* Type indicator icon */
+.toc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+  letter-spacing: 0;
+  font-family: var(--font-display);
+}
+
+.toc-icon-struct {
+  background: var(--badge-struct);
+  color: var(--badge-struct-fg);
+}
+
+.toc-icon-enum {
+  background: var(--badge-enum);
+  color: var(--badge-enum-fg);
+}
+
+.toc-icon-proc {
+  background: var(--badge-proc);
+  color: var(--badge-proc-fg);
+}
+
+.toc-icon-union {
+  background: var(--badge-union);
+  color: var(--badge-union-fg);
+}
+
+.toc-link-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-pkg-count {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+/* Highlight matching search text in sidebar */
+.search-hl {
+  background: var(--accent-dim);
+  color: var(--text);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Main content area */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Top header with project title and GitHub link */
+header {
+  padding: var(--sp-5) var(--sp-8) var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: rgba(19, 19, 19, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 5;
+}
+
+#header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+#title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+#title-sub {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  background: var(--surface-high);
+  padding: 2px 8px;
+  border-radius: var(--r-md);
+}
+
+/* GitHub repository link */
+#github-link {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  opacity: 0.5;
+  transition:
+    opacity 0.2s,
+    color 0.2s;
+  flex-shrink: 0;
+}
+
+#github-link:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+#github-link svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.tagline {
+  font-family: var(--font-body);
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  margin-top: 3px;
+}
+
+/* Buttons throughout the interface */
+button {
+  background: none;
+  border: 1px solid var(--ghost-strong);
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: var(--r-md);
+  padding: 5px 8px;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.15s;
+}
+
+button:hover {
+  background: var(--surface-high);
+  color: var(--text);
+  border-color: var(--ghost-strong);
+}
+
+button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.icon-btn {
+  font-size: 0.95rem;
+  padding: 4px 9px;
+  border: none;
+}
+
+/* Toolbar with search and filter buttons */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-8);
+  flex-shrink: 0;
+  background: rgba(19, 19, 19, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+  z-index: 4;
+  box-shadow: 0 1px 0 var(--ghost);
+}
+
+/* Search input field */
+#search {
+  flex: 1;
+  min-width: 160px;
+  background: var(--surface-highest);
+  border: none;
+  border-radius: var(--r-xl);
+  padding: 7px 14px;
+  color: var(--text);
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: box-shadow 0.2s;
+}
+
+#search:focus {
+  box-shadow:
+    0 0 0 2px var(--accent-dim),
+    inset 0 0 0 1px var(--accent);
+}
+
+#search::placeholder {
+  color: var(--text-faint);
+}
+
+#filter-btns {
+  display: flex;
+  gap: 4px;
+}
+
+#toolbar-right {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* Category filter buttons */
+.filter-btn {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border: 1px solid var(--ghost-strong);
+  border-radius: var(--r-md);
+  letter-spacing: 0.02em;
+}
+
+.filter-count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  opacity: 0.55;
+  margin-left: 3px;
+}
+
+.filter-btn.active {
+  background: var(--btn-color, var(--accent));
+  border-color: var(--btn-color, var(--accent));
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+.filter-btn.active .filter-count {
+  opacity: 0.7;
+}
+
+/* Main scrollable content area */
+#api-root {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 var(--sp-8) var(--sp-16);
+}
+
+#api-root::-webkit-scrollbar {
+  width: 5px;
+}
+
+#api-root::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#api-root::-webkit-scrollbar-thumb {
+  background: var(--ghost-strong);
+  border-radius: 3px;
+}
+
+/* File sections — groups of related symbols */
+.file-section {
+  margin-top: var(--sp-12);
+}
+
+.file-section:first-child {
+  margin-top: var(--sp-8);
+}
+
+/* File name header */
+.file-header {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--surface-low);
+  padding: var(--sp-3) var(--sp-5);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+
+.file-sym-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+/* Declaration details — expandable symbol containers */
+details {
+  background: var(--surface-low);
+  transition: background 0.12s;
+  border-radius: 0;
+  box-shadow: inset 0 1px 0 var(--ghost);
+}
+
+.file-header + details {
+  box-shadow: none;
+}
+
+details:last-child {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+.file-header + details:last-child {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+/* Smooth expand/collapse animation */
+details .content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+  overflow: hidden;
+}
+
+details.is-open .content {
+  grid-template-rows: 1fr;
+}
+
+details .content > * {
+  min-height: 0;
+}
+
+/* Summary row — always visible, clickable to expand */
+summary {
+  padding: var(--sp-4) var(--sp-5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary:hover {
+  background: var(--surface-high);
+}
+
+.item-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+/* Preview of the first doc comment line */
+.item-doc-preview {
+  opacity: 0.6;
+  font-size: 0.85em;
+  margin: 0 0.5em;
+  color: var(--m-gray);
+  align-self: center;
+}
+
+.attr {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--m-orange);
+  opacity: 0.8;
+}
+
+/* Type badge — struct, enum, proc, union */
+.badge {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--r-md);
+  letter-spacing: 0.04em;
+}
+
+.badge-struct {
+  background: var(--badge-struct);
+  color: var(--badge-struct-fg);
+}
+
+.badge-enum {
+  background: var(--badge-enum);
+  color: var(--badge-enum-fg);
+}
+
+.badge-proc {
+  background: var(--badge-proc);
+  color: var(--badge-proc-fg);
+}
+
+.badge-union {
+  background: var(--badge-union);
+  color: var(--badge-union-fg);
+}
+
+/* Doc comments section */
+.doc-text {
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-lowest);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* Parameters and return types section */
+.sig-bar {
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--surface-lowest);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  overflow-x: auto;
+}
+
+.sig-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.sig-val {
+  color: var(--text);
+}
+
+.sig-ret {
+  color: var(--m-teal);
+}
+
+.sig-param-name {
+  color: var(--text-dim);
+}
+
+.sig-param-type {
+  color: var(--m-blue);
+  font-style: italic;
+}
+
+.sig-colon {
+  color: var(--text-faint);
+}
+
+.sig-comma {
+  color: var(--text-faint);
+}
+
+/* "Used by" references — where this symbol is called from */
+.refs-bar {
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--surface-lowest);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.refs-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-right: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.ref-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  border-radius: var(--r-md);
+  background: var(--accent-dim);
+  transition: background 0.12s;
+}
+
+.ref-link:hover {
+  background: rgba(157, 202, 255, 0.22);
+}
+
+/* Code block container */
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-5) var(--sp-2) var(--sp-5);
+  background: var(--m-bg-header);
+}
+
+.code-file {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--m-gray);
+}
+
+/* Copy to clipboard button */
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  border: none;
+  padding: 3px 8px;
+  color: var(--m-gray);
+  background: transparent;
+  border-radius: var(--r-sm);
+  transition:
+    color 0.12s,
+    background 0.12s;
+}
+
+.copy-btn:hover {
+  color: var(--m-fg);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.copy-btn.copied {
+  color: var(--m-green) !important;
+}
+
+/* Syntax highlighted code block */
+.content pre {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-5);
+  background: var(--m-bg);
+  white-space: pre;
+  overflow-x: auto;
+  tab-size: 4;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+details:last-child .content pre {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+.content code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--m-fg);
+  background: none;
+  white-space: pre;
+}
+
+/* Cross-reference links within code */
+.sym-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+
+.sym-link:hover {
+  opacity: 1;
+  border-bottom-style: solid;
+}
+
+/* Flash animation when symbol is navigated to */
+@keyframes sym-flash {
+  0% {
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 16px var(--accent-dim);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px transparent,
+      0 0 0 transparent;
+  }
+}
+
+details.flash {
+  animation: sym-flash 0.9s ease-out forwards;
+}
+
+/* "No results" message when search returns nothing */
+#no-results {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  z-index: 10;
+}
+
+#no-results[aria-hidden="true"] {
+  opacity: 0;
+}
+
+#no-results[aria-hidden="false"] {
+  opacity: 1;
+}
+
+#no-results-icon {
+  font-size: 2.8rem;
+  color: var(--text-faint);
+  margin-bottom: var(--sp-3);
+}
+
+#no-results-text {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: var(--sp-1);
+}
+
+#no-results-sub {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+/* Mobile and tablet responsive styles */
+@media (max-width: 700px) {
+  #sidebar {
+    display: none;
+  }
+  #sidebar-resize {
+    display: none;
+  }
+  #sidebar-toggle {
+    display: none;
+  }
+  body {
+    overflow: auto;
+  }
+  #main {
+    overflow: visible;
+  }
+  #api-root {
+    overflow: visible;
+    padding: 0 var(--sp-4) var(--sp-12);
+  }
+  header {
+    padding: var(--sp-4);
+  }
+  #toolbar {
+    padding: var(--sp-3) var(--sp-4);
+  }
+  .filter-count {
+    display: none;
+  }
+  h1 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 580px) {
+  .item-doc-preview {
+    display: none;
+  }
+}
+</style>&quot;] = style_content
+
+	theme_content: string
+	if embed {
+		theme_bytes, _ := os.read_entire_file(config.paths.theme_css, context.allocator)
+		theme_content = strings.concatenate(
+			{&quot;&lt;style&gt;&quot;, string(theme_bytes), &quot;&lt;/style&gt;&quot;},
+			context.temp_allocator,
+		)
+	} else {
+		theme_content = config.paths.theme_css
+	}
+	replacements[&quot;<style>/* ============================================================================
+   Odin Obsidian — Theme
+
+   Color palette for syntax highlighting and symbol badges.
+   Works alongside obsidian.css for a cohesive design system.
+   ============================================================================ */
+
+:root {
+  /* Code block colors — used for syntax highlighting */
+  --m-bg: #0e0e0e;
+  --m-bg-header: #181818;
+  --m-fg: #c6c6c7;
+  --m-pink: #ffb2bd;
+  --m-green: #a8d5a2;
+  --m-blue: #9dcaff;
+  --m-yellow: #f5d991;
+  --m-gray: #5a5a6a;
+  --m-purple: #c4a5f0;
+  --m-orange: #f0b080;
+  --m-teal: #7ed4c8;
+  --m-red: #ffb2bd;
+  --m-sky: #89c9de;
+  --m-mauve: #c4a5f0;
+  --m-peach: #f0b080;
+  /* Badge backgrounds and text colors for symbol types */
+  --badge-struct: rgba(157, 202, 255, 0.12);
+  --badge-struct-fg: #9dcaff;
+  --badge-enum: rgba(168, 213, 162, 0.12);
+  --badge-enum-fg: #a8d5a2;
+  --badge-proc: rgba(255, 178, 189, 0.12);
+  --badge-proc-fg: #ffb2bd;
+  --badge-union: rgba(196, 165, 240, 0.12);
+  --badge-union-fg: #c4a5f0;
+}
+
+/* Syntax highlighting for code blocks */
+
+/* Comments — dimmed and italicized */
+.hl-cm {
+  color: var(--m-gray);
+  font-style: italic;
+}
+
+/* String literals — green */
+.hl-str {
+  color: var(--m-green);
+}
+
+/* Language keywords — bold mauve */
+.hl-kw {
+  color: var(--m-mauve);
+  font-weight: 600;
+}
+
+/* Type names — blue */
+.hl-ty {
+  color: var(--m-blue);
+}
+
+/* Function/procedure names — blue */
+.hl-fn {
+  color: var(--m-blue);
+}
+
+/* Built-in functions and procs — italicized teal */
+.hl-bi {
+  color: var(--m-teal);
+  font-style: italic;
+}
+
+/* Boolean and nil literals — peach */
+.hl-bl {
+  color: var(--m-peach);
+}
+
+/* Numeric literals — peach */
+.hl-nm {
+  color: var(--m-peach);
+}
+
+/* Directives like #include — sky blue */
+.hl-dr {
+  color: var(--m-sky);
+}
+
+/* Attributes like @private — italicized sky blue */
+.hl-at {
+  color: var(--m-sky);
+  font-style: italic;
+}
+
+/* Operators — subtle foreground */
+.hl-op {
+  color: var(--m-fg);
+  opacity: 0.5;
+}
+
+/* Double colon :: — pink with reduced opacity */
+.hl-dc {
+  color: var(--m-pink);
+  opacity: 0.65;
+}
+
+/* Colon-equals := — pink with reduced opacity */
+.hl-as {
+  color: var(--m-pink);
+  opacity: 0.65;
+}
+
+/* Pointer symbol ^ — pink */
+.hl-pt {
+  color: var(--m-pink);
+  opacity: 0.7;
+}
+
+/* Return arrow -> — teal */
+.hl-ar {
+  color: var(--m-teal);
+  opacity: 0.85;
+}
+</style>&quot;] = theme_content
+
+	replacements[&quot;{"main.odin":[{"id":"main.odin--analyze_cross_references","name":"analyze_cross_references","cat":"proc"},{"id":"main.odin--collect_declarations","name":"collect_declarations","cat":"proc"},{"id":"main.odin--main","name":"main","cat":"proc"}],"parser.odin":[{"id":"parser.odin--Declaration","name":"Declaration","cat":"struct"},{"id":"parser.odin--Metadata","name":"Metadata","cat":"struct"},{"id":"parser.odin--Parameter","name":"Parameter","cat":"struct"},{"id":"parser.odin--Signature","name":"Signature","cat":"struct"},{"id":"parser.odin--extract_file_name","name":"extract_file_name","cat":"proc"},{"id":"parser.odin--extract_preceding_metadata","name":"extract_preceding_metadata","cat":"proc"},{"id":"parser.odin--extract_signature","name":"extract_signature","cat":"proc"},{"id":"parser.odin--get_code_block","name":"get_code_block","cat":"proc"},{"id":"parser.odin--parse_declarations","name":"parse_declarations","cat":"proc"},{"id":"parser.odin--parse_signature","name":"parse_signature","cat":"proc"},{"id":"parser.odin--split_params","name":"split_params","cat":"proc"}],"template.odin":[{"id":"template.odin--Syntax","name":"Syntax","cat":"struct"},{"id":"template.odin--Toc_Item","name":"Toc_Item","cat":"struct"},{"id":"template.odin--build_highlight_rules","name":"build_highlight_rules","cat":"proc"},{"id":"template.odin--build_toc_json","name":"build_toc_json","cat":"proc"},{"id":"template.odin--declaration_to_html","name":"declaration_to_html","cat":"proc"},{"id":"template.odin--escape_html","name":"escape_html","cat":"proc"},{"id":"template.odin--generate_content_html","name":"generate_content_html","cat":"proc"},{"id":"template.odin--generate_html","name":"generate_html","cat":"proc"},{"id":"template.odin--strip_comment_prefix","name":"strip_comment_prefix","cat":"proc"}],"config.odin":[{"id":"config.odin--Config","name":"Config","cat":"struct"},{"id":"config.odin--load_config","name":"load_config","cat":"proc"}]}&quot;] = build_toc_json(declarations)
+
+	syntax_path := config.paths.syntax_json
+	syntax_bytes, syn_err := os.read_entire_file(syntax_path, context.allocator)
+	if syn_err != nil {
+		fmt.panicf(&quot;Error: could not read syntax file -&gt; %s\n&quot;, syntax_path)
+	}
+	syntax: Syntax
+	syntax_err := json.unmarshal(syntax_bytes, &amp;syntax)
+	if syntax_err != nil {
+		fmt.panicf(&quot;Error: could not parse syntax file -&gt; %v\n&quot;, syntax_err)
+	}
+
+	replacements[&quot;var RULES = [{cls: "cm", re: /\/\*[\s\S]*?\*\//g},{cls: "cm", re: /\/\/[^\n]*/g},{cls: "str", re: /`[^`]*`/g},{cls: "str", re: /"(?:[^"\\]|\\.)*"/g},{cls: "kw", re: /\b(?:package|import|proc|struct|enum|union|bit_set|map|dynamic|matrix|return|defer|if|else|when|for|switch|case|break|continue|fallthrough|using|context|foreign|distinct|where|do|in|not_in|or_else|or_return|or_break|or_continue|auto_cast|cast|transmute)\b/g},{cls: "ty", re: /\b(?:bool|b8|b16|b32|b64|byte|rune|string|cstring|rawptr|any|typeid|int|uint|uintptr|i8|i16|i32|i64|i128|i16le|i16be|i32le|i32be|i64le|i64be|i128le|i128be|u8|u16|u32|u64|u128|u16le|u16be|u32le|u32be|u64le|u64be|u128le|u128be|f16|f32|f64|f16le|f16be|f32le|f32be|f64le|f64be|complex32|complex64|complex128|quaternion64|quaternion128|quaternion256)\b/g},{cls: "bi", re: /\b(?:len|cap|size_of|align_of|offset_of|offset_of_by_string|type_of|type_info_of|typeid_of|make|new|new_clone|free|free_all|delete|append|append_elem|append_elems|append_nothing|non_zero_append|non_zero_append_elem|non_zero_append_elems|assign_at|clear|reserve|resize|shrink|copy|unordered_remove|ordered_remove|pop|push|swizzle|complex|quaternion|real|imag|jmag|kmag|conj|expand_to_tuple|min|max|abs|clamp|assert|assertf|panic|panicf|unreachable|print|println|printf|printfln|fprintf|sprintf|sprintfln|eprintf|eprintln|eprintfln)\b/g},{cls: "bl", re: /\b(?:true|false|nil)\b/g},];&quot;] = build_highlight_rules(syntax)
+	replacements[&quot;25&quot;] = fmt.aprintf(&quot;%d&quot;, len(declarations))
+
+	now := time.now()
+	time_buf: [time.MIN_YYYY_DATE_LEN]u8
+	generated_at := time.to_string_dd_mm_yyyy(now, time_buf[:])
+	replacements[&quot;30-03-2026&quot;] = generated_at
+
+	// Apply all replacements
+	result := template
+	for key, value in replacements {
+		result, _ = strings.replace_all(result, key, value)
+	}
+	return result
+}</code></pre>
+    </div>
+</details>
+        <details id="template.odin--strip_comment_prefix">
+    <summary>
+        <span class="item-name">strip_comment_prefix</span>
+        <span class="badge badge-proc">PROC</span>
+    </summary>
+    <div class="sig-bar">
+        <span class="sig-label">params</span>
+        <span class="sig-val">line: string</span>
+    </div>
+    <div class="content">
+        <div class="code-header">
+            <span class="code-file">template.odin</span>
+            <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code class="language-odin">strip_comment_prefix :: proc(line: string) -&gt; string {
+	if strings.has_prefix(line, &quot;// &quot;) { return line[3:] }
+	if strings.has_prefix(line, &quot;//&quot;)  { return line[2:] }
+	return line
+}</code></pre>
+    </div>
+</details>
+    </div></div>
+
+    <div id="no-results" aria-hidden="true">
+        <div id="no-results-icon">&#8708;</div>
+        <div id="no-results-text">No symbols match</div>
+        <div id="no-results-sub">Try a different name or category</div>
+    </div>
+</main>
+
+<script>
+"use strict";
+
+// ============================================================================
+// 1. Data
+// ============================================================================
+var TOC  = JSON.parse(document.getElementById("toc-data").textContent);
+var META = JSON.parse(document.getElementById("meta-data").textContent);
+
+document.getElementById("sidebar-count").textContent = META.item_count + " symbols";
+document.getElementById("gen-time").textContent      = META.generated_at;
+
+// Flat name -> id map, O(1) lookup. First declaration wins on collision.
+var SYMBOL_MAP = Object.create(null);
+Object.entries(TOC).forEach(function (entry) {
+    entry[1].forEach(function (sym) {
+        if (!SYMBOL_MAP[sym.name]) SYMBOL_MAP[sym.name] = sym.id;
+    });
+});
+
+// ============================================================================
+// 2. Syntax highlighter — single-pass, priority-ordered rules
+//    The _buf bitmap ensures a range claimed by an earlier rule is never
+//    overwritten by a later one.
+// ============================================================================
+(function () {
+    var RULES = [{cls: "cm", re: /\/\*[\s\S]*?\*\//g},{cls: "cm", re: /\/\/[^\n]*/g},{cls: "str", re: /`[^`]*`/g},{cls: "str", re: /"(?:[^"\\]|\\.)*"/g},{cls: "kw", re: /\b(?:package|import|proc|struct|enum|union|bit_set|map|dynamic|matrix|return|defer|if|else|when|for|switch|case|break|continue|fallthrough|using|context|foreign|distinct|where|do|in|not_in|or_else|or_return|or_break|or_continue|auto_cast|cast|transmute)\b/g},{cls: "ty", re: /\b(?:bool|b8|b16|b32|b64|byte|rune|string|cstring|rawptr|any|typeid|int|uint|uintptr|i8|i16|i32|i64|i128|i16le|i16be|i32le|i32be|i64le|i64be|i128le|i128be|u8|u16|u32|u64|u128|u16le|u16be|u32le|u32be|u64le|u64be|u128le|u128be|f16|f32|f64|f16le|f16be|f32le|f32be|f64le|f64be|complex32|complex64|complex128|quaternion64|quaternion128|quaternion256)\b/g},{cls: "bi", re: /\b(?:len|cap|size_of|align_of|offset_of|offset_of_by_string|type_of|type_info_of|typeid_of|make|new|new_clone|free|free_all|delete|append|append_elem|append_elems|append_nothing|non_zero_append|non_zero_append_elem|non_zero_append_elems|assign_at|clear|reserve|resize|shrink|copy|unordered_remove|ordered_remove|pop|push|swizzle|complex|quaternion|real|imag|jmag|kmag|conj|expand_to_tuple|min|max|abs|clamp|assert|assertf|panic|panicf|unreachable|print|println|printf|printfln|fprintf|sprintf|sprintfln|eprintf|eprintln|eprintfln)\b/g},{cls: "bl", re: /\b(?:true|false|nil)\b/g},];
+
+    function esc(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    var _buf = new Uint8Array(0);
+
+    function highlight(raw) {
+        var n = raw.length;
+        if (_buf.length < n) { _buf = new Uint8Array(n * 2); }
+        else                 { _buf.fill(0, 0, n); }
+
+        var matches = [];
+        for (var ri = 0; ri < RULES.length; ri++) {
+            var rule = RULES[ri];
+            rule.re.lastIndex = 0;
+            var m;
+            while ((m = rule.re.exec(raw)) !== null) {
+                var s = m.index;
+                var e = rule.cap ? s + m[1].length : s + m[0].length;
+                var skip = false;
+                for (var i = s; i < e; i++) { if (_buf[i]) { skip = true; break; } }
+                if (skip) continue;
+                for (var j = s; j < e; j++) _buf[j] = 1;
+                matches.push([s, e, rule.cls]);
+            }
+        }
+        matches.sort(function (a, b) { return a[0] - b[0]; });
+
+        var out = "", pos = 0;
+        for (var k = 0; k < matches.length; k++) {
+            var ms = matches[k][0], me = matches[k][1], mc = matches[k][2];
+            if (ms > pos) out += esc(raw.slice(pos, ms));
+            out += "<span class=\"hl-" + mc + "\">" + esc(raw.slice(ms, me)) + "</span>";
+            pos = me;
+        }
+        if (pos < n) out += esc(raw.slice(pos));
+        return out;
+    }
+
+    window.highlightAll = function (root) {
+        var els = (root || document).querySelectorAll("code.language-odin:not([data-hl])");
+        for (var i = 0; i < els.length; i++) {
+            els[i].dataset.hl = "1";
+            els[i].innerHTML  = highlight(els[i].textContent);
+        }
+    };
+}());
+
+// ============================================================================
+// 3. Cross-reference linker
+// ============================================================================
+(function () {
+    var LINKABLE = { "hl-fn": true, "hl-ty": true, "hl-bi": true };
+    var SKIP_CLS = { "hl-cm": true, "hl-str": true, "hl-kw": true,
+                     "hl-dr": true, "hl-at": true,  "hl-nm": true,
+                     "hl-bl": true, "hl-dc": true,  "hl-as": true };
+    var IDENT_RE = /\b([A-Za-z_]\w*)\b/g;
+
+    function esc(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function makeLink(word, id) {
+        var a = document.createElement("a");
+        a.className   = "sym-link";
+        a.href        = "#" + id;
+        a.title       = "Go to " + word;
+        a.textContent = word;
+        a.onclick = (function (tid) {
+            return function (ev) { ev.preventDefault(); navigateTo(tid); };
+        }(id));
+        return a;
+    }
+
+    function linkTextNode(node, self) {
+        var text = node.nodeValue;
+        IDENT_RE.lastIndex = 0;
+        var m, parts = [], pos = 0, any = false;
+        while ((m = IDENT_RE.exec(text)) !== null) {
+            var w = m[1];
+            if (w === self || !SYMBOL_MAP[w]) continue;
+            if (m.index > pos) parts.push(document.createTextNode(text.slice(pos, m.index)));
+            parts.push(makeLink(w, SYMBOL_MAP[w]));
+            pos = m.index + w.length;
+            any = true;
+        }
+        if (!any) return;
+        if (pos < text.length) parts.push(document.createTextNode(text.slice(pos)));
+        var parent = node.parentNode;
+        parts.forEach(function (n) { parent.insertBefore(n, node); });
+        parent.removeChild(node);
+    }
+
+    function linkSpan(span, self) {
+        var w = span.textContent;
+        if (!w || w === self || !SYMBOL_MAP[w] || span.querySelector("a.sym-link")) return;
+        var a = makeLink(w, SYMBOL_MAP[w]);
+        while (span.firstChild) a.appendChild(span.firstChild);
+        span.appendChild(a);
+    }
+
+    window.linkAll = function (root) {
+        var els = (root || document).querySelectorAll("code.language-odin[data-hl]:not([data-linked])");
+        for (var i = 0; i < els.length; i++) {
+            var el   = els[i];
+            el.dataset.linked = "1";
+            var det  = el.closest("details");
+            var self = det ? ((det.querySelector(".item-name") || {}).textContent || "") : "";
+            var kids = Array.from(el.childNodes);
+            for (var c = 0; c < kids.length; c++) {
+                var node = kids[c];
+                if (node.nodeType === Node.TEXT_NODE) {
+                    linkTextNode(node, self);
+                } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "SPAN") {
+                    if (SKIP_CLS[node.className]) continue;
+                    if (LINKABLE[node.className]) linkSpan(node, self);
+                }
+            }
+        }
+    };
+}());
+
+// ============================================================================
+// 4. Navigation
+// ============================================================================
+var NAV_HISTORY = [];
+var _sidebarLinkMap = Object.create(null);
+
+function updateActiveSidebarLink(id) {
+    Object.keys(_sidebarLinkMap).forEach(function (k) {
+        _sidebarLinkMap[k].classList.toggle("active", k === id);
+    });
+}
+
+function updateBackBtn() {
+    var btn = document.getElementById("back-btn");
+    if (btn) btn.disabled = NAV_HISTORY.length === 0;
+}
+
+function navigateTo(itemId, pushHistory) {
+    var el = document.getElementById(itemId);
+    if (!el) return;
+
+    if (pushHistory !== false) {
+        var cur = window.location.hash.slice(1);
+        if (cur && cur !== itemId) {
+            NAV_HISTORY.push(cur);
+            if (NAV_HISTORY.length > 20) NAV_HISTORY.shift();
+        }
+    }
+
+    el.open = true;
+    window.highlightAll(el);
+    window.linkAll(el);
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.classList.add("flash");
+    setTimeout(function () { el.classList.remove("flash"); }, 900);
+    history.replaceState({ navType: "internal" }, "", "#" + itemId);
+    updateBackBtn();
+    updateActiveSidebarLink(itemId);
+}
+
+// ============================================================================
+// 5. Bootstrap
+// ============================================================================
+document.addEventListener("DOMContentLoaded", function () {
+
+    window.highlightAll();
+    window.linkAll();
+    updateBackBtn();
+
+    // Anchor on load
+    (function () {
+        var hash = window.location.hash.slice(1);
+        if (!hash) return;
+        var isReload = (history.state && history.state.navType === "internal") ||
+                       (performance.navigation && performance.navigation.type >= 1);
+        if (isReload) { history.replaceState(null, "", window.location.pathname); return; }
+        var el = document.getElementById(hash);
+        if (!el) return;
+        el.open = true;
+        window.highlightAll(el);
+        window.linkAll(el);
+        setTimeout(function () { el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80);
+    }());
+
+    // Lazy highlight/link on <details> toggle
+    document.addEventListener("toggle", function (e) {
+        if (e.target.tagName !== "DETAILS") return;
+        e.target.classList.toggle("is-open", e.target.open);
+        if (e.target.open) { window.highlightAll(e.target); window.linkAll(e.target); }
+    }, true);
+
+    // ref-link clicks (delegated)
+    document.getElementById("api-root").addEventListener("click", function (e) {
+        var a = e.target.closest(".ref-link");
+        if (!a) return;
+        e.preventDefault();
+        navigateTo(a.getAttribute("href").slice(1));
+    });
+
+    // ── Sidebar build ────────────────────────────────────────────────────────
+    var sidebarContent = document.getElementById("sidebar-content");
+    var sidebarGroups  = [];
+    var CAT_ICON       = { STRUCT: "S", ENUM: "E", PROC: "P", UNION: "U" };
+
+    var detailMeta = Array.from(document.querySelectorAll("details")).map(function (el) {
+        var nameEl  = el.querySelector("summary .item-name");
+        var badgeEl = el.querySelector(".badge");
+        return {
+            el:   el,
+            name: nameEl  ? nameEl.textContent.toLowerCase() : "",
+            cat:  badgeEl ? badgeEl.textContent.trim()        : "",
+            sec:  el.closest(".file-section"),
+        };
+    });
+
+    var allSections = Array.from(document.querySelectorAll(".file-section"));
+
+    Object.entries(TOC).forEach(function (entry) {
+        var pkg    = entry[0];
+        var syms   = entry[1];
+        var safeId = pkg.replace(/[/\\.]/g, "-");
+        var storeKey    = "toc-" + safeId;
+        var isCollapsed = localStorage.getItem(storeKey) !== "0";
+
+        var group = document.createElement("div");
+        group.className = "toc-group";
+
+        var hdr = document.createElement("div");
+        hdr.className = "toc-pkg";
+
+        var label = document.createElement("span");
+        label.className   = "toc-pkg-label";
+        label.textContent = pkg.replace(/^.*[/\\]/, "").replace(/\.odin$/i, "");
+
+        var count = document.createElement("span");
+        count.className   = "toc-pkg-count";
+        count.textContent = syms.length;
+
+        var arrow = document.createElement("span");
+        arrow.className = "toc-arrow";
+        arrow.innerHTML = "&#9662;";
+
+        hdr.appendChild(label);
+        hdr.appendChild(count);
+        hdr.appendChild(arrow);
+
+        var list = document.createElement("ul");
+        list.className = "toc-list";
+
+        function applyCollapse() {
+            list.classList.toggle("collapsed", isCollapsed);
+            arrow.style.transform = isCollapsed ? "rotate(-90deg)" : "";
+        }
+        applyCollapse();
+
+        hdr.onclick = function () {
+            isCollapsed = !isCollapsed;
+            localStorage.setItem(storeKey, isCollapsed ? "1" : "0");
+            applyCollapse();
+        };
+
+        sidebarGroups.push({
+            setCollapsed: function (v) {
+                isCollapsed = v;
+                localStorage.setItem(storeKey, v ? "1" : "0");
+                applyCollapse();
+            }
+        });
+
+        syms.forEach(function (sym) {
+            var li   = document.createElement("li");
+            var a    = document.createElement("a");
+            a.href       = "#" + sym.id;
+            a.className  = "toc-link toc-" + sym.cat.toLowerCase();
+            a.dataset.id = sym.id;
+
+            var icon = document.createElement("span");
+            icon.className   = "toc-icon toc-icon-" + sym.cat.toLowerCase();
+            icon.textContent = CAT_ICON[sym.cat] || sym.cat[0];
+
+            var name = document.createElement("span");
+            name.className   = "toc-link-name";
+            name.textContent = sym.name;
+
+            a.appendChild(icon);
+            a.appendChild(name);
+
+            a.onclick = (function (id) {
+                return function (ev) {
+                    ev.preventDefault();
+                    if (isCollapsed) {
+                        isCollapsed = false;
+                        localStorage.setItem(storeKey, "0");
+                        applyCollapse();
+                    }
+                    navigateTo(id);
+                };
+            }(sym.id));
+
+            _sidebarLinkMap[sym.id] = a;
+
+            li.appendChild(a);
+            list.appendChild(li);
+        });
+
+        group.appendChild(hdr);
+        group.appendChild(list);
+        sidebarContent.appendChild(group);
+    });
+
+    document.getElementById("sb-expand-all").onclick = function () {
+        sidebarGroups.forEach(function (g) { g.setCollapsed(false); });
+    };
+    document.getElementById("sb-collapse-all").onclick = function () {
+        sidebarGroups.forEach(function (g) { g.setCollapsed(true); });
+    };
+
+    // ── Sidebar toggle ──────────────────────────────────────────────────────
+    var sidebar     = document.getElementById("sidebar");
+    var sidebarOpen = localStorage.getItem("sidebar") !== "0";
+
+    function setSidebar(open) {
+        sidebarOpen = open;
+        sidebar.classList.toggle("hidden", !open);
+        localStorage.setItem("sidebar", open ? "1" : "0");
+    }
+    setSidebar(sidebarOpen);
+    document.getElementById("sidebar-toggle").onclick = function () { setSidebar(!sidebarOpen); };
+
+    // ── Back button ─────────────────────────────────────────────────────────
+    document.getElementById("back-btn").onclick = function () {
+        if (!NAV_HISTORY.length) return;
+        navigateTo(NAV_HISTORY.pop(), false);
+        updateBackBtn();
+    };
+
+    // ── Search + filter ─────────────────────────────────────────────────────
+    var searchEl   = document.getElementById("search");
+    var filterBtns = document.querySelectorAll(".filter-btn");
+    var noResults  = document.getElementById("no-results");
+    var activeCat  = "ALL";
+    var _jkIndex   = -1;
+
+    var catCounts = { ALL: detailMeta.length, STRUCT: 0, ENUM: 0, PROC: 0, UNION: 0 };
+    detailMeta.forEach(function (m) {
+        if (catCounts[m.cat] !== undefined) catCounts[m.cat]++;
+    });
+    filterBtns.forEach(function (btn) {
+        var el = btn.querySelector(".filter-count");
+        if (el && catCounts[btn.dataset.cat] !== undefined)
+            el.textContent = catCounts[btn.dataset.cat];
+    });
+
+    var tocLinkNames = Array.from(sidebarContent.querySelectorAll(".toc-link-name"));
+
+    function escHtml(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function highlightMatch(el, term) {
+        var text = el.dataset.orig || el.textContent;
+        el.dataset.orig = text;
+        if (!term) { el.textContent = text; return; }
+        var idx = text.toLowerCase().indexOf(term);
+        if (idx === -1) { el.textContent = text; return; }
+        el.innerHTML =
+            escHtml(text.slice(0, idx)) +
+            "<mark class='search-hl'>" + escHtml(text.slice(idx, idx + term.length)) + "</mark>" +
+            escHtml(text.slice(idx + term.length));
+    }
+
+    function applyFilters() {
+        var term   = searchEl.value.toLowerCase();
+        var anyVis = false;
+        _jkIndex   = -1;
+        var secVis = new Map();
+        allSections.forEach(function (s) { secVis.set(s, false); });
+
+        detailMeta.forEach(function (m) {
+            var vis = m.name.indexOf(term) !== -1 && (activeCat === "ALL" || m.cat === activeCat);
+            m.el.style.display = vis ? "" : "none";
+            if (vis) { anyVis = true; if (m.sec) secVis.set(m.sec, true); }
+        });
+
+        allSections.forEach(function (sec) { sec.style.display = secVis.get(sec) ? "" : "none"; });
+        tocLinkNames.forEach(function (el) { highlightMatch(el, term); });
+        noResults.setAttribute("aria-hidden", anyVis ? "true" : "false");
+    }
+
+    searchEl.addEventListener("input", applyFilters);
+
+    filterBtns.forEach(function (btn) {
+        btn.onclick = function () {
+            filterBtns.forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            activeCat = btn.dataset.cat;
+            applyFilters();
+        };
+    });
+
+    // ── Expand / collapse all ───────────────────────────────────────────────
+    document.getElementById("expand-all").onclick = function () {
+        detailMeta.forEach(function (m) {
+            if (m.el.style.display !== "none") {
+                m.el.open = true;
+                window.highlightAll(m.el);
+                window.linkAll(m.el);
+            }
+        });
+    };
+    document.getElementById("collapse-all").onclick = function () {
+        detailMeta.forEach(function (m) { m.el.open = false; });
+    };
+
+    // ── Copy code ───────────────────────────────────────────────────────────
+    window.copyCode = function (btn) {
+        var code = btn.closest("details") && btn.closest("details").querySelector("code");
+        if (!code) return;
+        navigator.clipboard.writeText(code.textContent).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = "\u2713";
+            btn.classList.add("copied");
+            setTimeout(function () { btn.textContent = orig; btn.classList.remove("copied"); }, 1500);
+        });
+    };
+
+    // ── Sidebar resize ──────────────────────────────────────────────────────
+    (function () {
+        var handle   = document.getElementById("sidebar-resize");
+        var sb       = document.getElementById("sidebar");
+        var dragging = false;
+        var startX, startW;
+        var MIN_W = 180, MAX_W = 440;
+
+        function startDrag(x) {
+            dragging = true; startX = x; startW = sb.offsetWidth;
+            handle.classList.add("dragging");
+            document.body.style.cssText += ";cursor:col-resize;user-select:none";
+        }
+        function moveDrag(x) {
+            if (!dragging) return;
+            var w = Math.min(MAX_W, Math.max(MIN_W, startW + (x - startX)));
+            sb.style.width = sb.style.minWidth = w + "px";
+            localStorage.setItem("sidebar-width", w);
+        }
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            handle.classList.remove("dragging");
+            document.body.style.cursor = document.body.style.userSelect = "";
+        }
+
+        handle.addEventListener("mousedown",   function (e) { startDrag(e.clientX); });
+        document.addEventListener("mousemove", function (e) { moveDrag(e.clientX); });
+        document.addEventListener("mouseup",   endDrag);
+        handle.addEventListener("touchstart",  function (e) { startDrag(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchmove", function (e) { if (dragging) { moveDrag(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
+        document.addEventListener("touchend",  endDrag);
+
+        var saved = parseInt(localStorage.getItem("sidebar-width"), 10);
+        if (saved >= MIN_W && saved <= MAX_W) sb.style.width = sb.style.minWidth = saved + "px";
+    }());
+});
+</script>
+</body>
+</html>
