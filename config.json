@@ -10,7 +10,7 @@
   },
   "paths": {
     "source_dir": ".",
-    "output_html": "./index.html",
+    "output_html": "./docs/index.html",
     "template_dir": "./template",
     "style_css": "./template/style.css",
     "theme_css": "./template/themes/obsidian.css",
