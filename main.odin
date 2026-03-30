@@ -2,6 +2,7 @@ package main
 
 import "core:fmt"
 import "core:os"
+import "core:path/filepath"
 import "core:strings"
 import "core:text/regex"
 
@@ -48,6 +49,8 @@ main :: proc() {
 	html_output := generate_html(template_path, config, all_declarations, embed)
 
 	output_path := config.paths.output_html
+	output_dir := filepath.dir(output_path, context.temp_allocator)
+	os.make_directory(output_dir)
 	err = os.write_entire_file(output_path, transmute([]byte)html_output)
 	if err != nil {
 		fmt.panicf("Error: could not write output file -> %s\n", output_path)

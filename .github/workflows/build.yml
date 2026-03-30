@@ -10,21 +10,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Odin
+      - name: Install dependencies
         run: |
+          apt-get update
+          apt-get install -y wget tar clang
+
+      - name: Download and install Odin
+        run: |
+          mkdir -p /opt/odin
           wget https://github.com/odin-lang/Odin/releases/download/dev-2026-03/odin-linux-amd64-dev-2026-03.tar.gz
-          tar -xzf odin-linux-amd64-dev-2026-03.tar.gz
-          ODIN_DIR=$(ls -d odin* 2>/dev/null | head -1)
-          sudo mv "$ODIN_DIR" /opt/odin
-          export PATH="/opt/odin:$PATH"
+          tar -xzf odin-linux-amd64-dev-2026-03.tar.gz -C /opt/odin --strip-components=1
+          chmod +x /opt/odin/odin
+          rm odin-linux-amd64-dev-2026-03.tar.gz
 
-      - name: Build doc generator
+      - name: Build docs
+        env:
+          PATH: /opt/odin:$PATH
         run: |
-          export PATH="/opt/odin:$PATH"
-          /opt/odin/odin build .
-
-      - name: Generate docs
-        run: ./odin-doc-generator --embed
+          odin build .
+          mkdir -p docs
+          ./odin-doc-generator --embed
+          mv index.html docs/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
