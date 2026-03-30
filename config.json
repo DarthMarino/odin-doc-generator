@@ -1,0 +1,25 @@
+{
+  "_comment": "Generator default config file, you should tweak it to your desires.",
+
+  "project": {
+    "name": "Odin Doc Generator",
+    "version": "1.0.0",
+    "description": "Single-page API documentation generator for Odin projects. Fast, beautiful, interactive.",
+    "repository": "https://github.com/DarthMarino/odin-doc-generator",
+    "page_title": "Odin Doc Generator"
+  },
+  "paths": {
+    "source_dir": ".",
+    "output_html": "./index.html",
+    "template_dir": "./template",
+    "style_css": "./template/style.css",
+    "theme_css": "./template/themes/obsidian.css",
+    "syntax_json": "./odin_syntax.json"
+  },
+  "sort_order": {
+    "STRUCT": 1,
+    "ENUM": 2,
+    "PROC": 3,
+    "UNION": 4
+  }
+}

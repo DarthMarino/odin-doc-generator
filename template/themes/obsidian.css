@@ -1,0 +1,120 @@
+/* ============================================================================
+   Odin Obsidian — Theme
+
+   Color palette for syntax highlighting and symbol badges.
+   Works alongside obsidian.css for a cohesive design system.
+   ============================================================================ */
+
+:root {
+  /* Code block colors — used for syntax highlighting */
+  --m-bg: #0e0e0e;
+  --m-bg-header: #181818;
+  --m-fg: #c6c6c7;
+  --m-pink: #ffb2bd;
+  --m-green: #a8d5a2;
+  --m-blue: #9dcaff;
+  --m-yellow: #f5d991;
+  --m-gray: #5a5a6a;
+  --m-purple: #c4a5f0;
+  --m-orange: #f0b080;
+  --m-teal: #7ed4c8;
+  --m-red: #ffb2bd;
+  --m-sky: #89c9de;
+  --m-mauve: #c4a5f0;
+  --m-peach: #f0b080;
+  /* Badge backgrounds and text colors for symbol types */
+  --badge-struct: rgba(157, 202, 255, 0.12);
+  --badge-struct-fg: #9dcaff;
+  --badge-enum: rgba(168, 213, 162, 0.12);
+  --badge-enum-fg: #a8d5a2;
+  --badge-proc: rgba(255, 178, 189, 0.12);
+  --badge-proc-fg: #ffb2bd;
+  --badge-union: rgba(196, 165, 240, 0.12);
+  --badge-union-fg: #c4a5f0;
+}
+
+/* Syntax highlighting for code blocks */
+
+/* Comments — dimmed and italicized */
+.hl-cm {
+  color: var(--m-gray);
+  font-style: italic;
+}
+
+/* String literals — green */
+.hl-str {
+  color: var(--m-green);
+}
+
+/* Language keywords — bold mauve */
+.hl-kw {
+  color: var(--m-mauve);
+  font-weight: 600;
+}
+
+/* Type names — blue */
+.hl-ty {
+  color: var(--m-blue);
+}
+
+/* Function/procedure names — blue */
+.hl-fn {
+  color: var(--m-blue);
+}
+
+/* Built-in functions and procs — italicized teal */
+.hl-bi {
+  color: var(--m-teal);
+  font-style: italic;
+}
+
+/* Boolean and nil literals — peach */
+.hl-bl {
+  color: var(--m-peach);
+}
+
+/* Numeric literals — peach */
+.hl-nm {
+  color: var(--m-peach);
+}
+
+/* Directives like #include — sky blue */
+.hl-dr {
+  color: var(--m-sky);
+}
+
+/* Attributes like @private — italicized sky blue */
+.hl-at {
+  color: var(--m-sky);
+  font-style: italic;
+}
+
+/* Operators — subtle foreground */
+.hl-op {
+  color: var(--m-fg);
+  opacity: 0.5;
+}
+
+/* Double colon :: — pink with reduced opacity */
+.hl-dc {
+  color: var(--m-pink);
+  opacity: 0.65;
+}
+
+/* Colon-equals := — pink with reduced opacity */
+.hl-as {
+  color: var(--m-pink);
+  opacity: 0.65;
+}
+
+/* Pointer symbol ^ — pink */
+.hl-pt {
+  color: var(--m-pink);
+  opacity: 0.7;
+}
+
+/* Return arrow -> — teal */
+.hl-ar {
+  color: var(--m-teal);
+  opacity: 0.85;
+}
